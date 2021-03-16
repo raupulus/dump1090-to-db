@@ -1,0 +1,13 @@
+{
+    "name": "fryntiz/dump1090_backup",
+    "description": "Store in database dump1090 captures",
+    "type": "project",
+    "authors": [
+        {
+            "name": "Raúl Caro Pastorino",
+            "email": "raul@fryntiz.dev"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {}
+}
