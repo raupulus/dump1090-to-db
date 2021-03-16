@@ -1,5 +1,7 @@
 <?php
 
+namespace App\Models;
+
 /**
  * Class Api
  */

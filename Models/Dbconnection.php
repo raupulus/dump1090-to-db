@@ -1,5 +1,5 @@
 <?php
-namespace app\models;
+namespace App\Models;
 
 /**
  * Clase que representa la conexión con la db y devuelve las colecciones de
