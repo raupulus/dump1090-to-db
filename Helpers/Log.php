@@ -1,24 +1,25 @@
-
 <?php
+namespace App\Helpers;
 
-namespace \App\Helpers;
-
-
+/**
+ * Class Log
+ *
+ * @package App\Helpers
+ */
 class Log
 {
-    public static function error()
+    public static function error($msg = '')
     {
-
+        echo "\n$msg\n";
     }
 
-    public static function success()
+    public static function success($msg = '')
     {
-
+        echo "\n$msg\n";
     }
 
-    public static function info()
+    public static function info($msg = '')
     {
-
+        echo "\n$msg\n";
     }
-
 }
