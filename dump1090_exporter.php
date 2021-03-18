@@ -29,6 +29,8 @@ require 'vendor/autoload.php';
 
  */
 
+## Environment vars
+
 define('DEBUG', true);
 
 ## Messages
