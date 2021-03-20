@@ -2,11 +2,13 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use function array_key_exists;
 use function array_keys;
 use function implode;
 use function in_array;
 use function is_array;
+use function is_numeric;
 use function json_encode;
 use function var_dump;
 
@@ -15,6 +17,8 @@ use function var_dump;
  */
 class Airflight
 {
+    private $startAt;
+
     /**
      * Atributos utilizados de los recibidos en el json.
      * Cada atributo es la clave que se asocia a un array de validaciones con
@@ -25,12 +29,22 @@ class Airflight
     public $attributes = [
         'hex' => [],
         'category' => [],
+        'squawk' => [],
+        'flight' => [],
+        'lat' => [],
+        'lon' => [],
+        'nucp' => [],
         'alt_baro' => ['feetToMeters'],
+        'altitude' => ['feetToMeters'],
+        'vert_rate' => ['feetToMeters'],
+        'track' => ['toInt'],
+        'speed' => ['knotsToMeters'],
         'version' => [],
         'sil_type' => [],
         'mlat' => [],
         'tisb' => [],
         'seen' => ['toInt', 'timestampFromLastSeconds'],
+        'seen_pos' => ['toInt', 'timestampFromLastSeconds'],
         'rssi' => [],
         'alt_geom' => [],
         'gs' => [],
@@ -49,6 +63,8 @@ class Airflight
 
     public function __construct(Array $datas = [])
     {
+        $this->startAt = Carbon::now();
+
         ## Recorre todos los registros de vuelo.
         foreach ($datas['aircraft'] as $aircraft) {
             // TODO → filter $attributes in $array
@@ -92,14 +108,18 @@ class Airflight
     /**
      * Convierte de pies a metros.
      *
-     * @param float $feets Recibe la cantidad de pies a convertir.
+     * @param mixed $feets Recibe la cantidad de pies a convertir.
      *
      * @return float|null
      */
-    private function feetToMeters(float $feets)
+    private function feetToMeters($feets)
     {
         if (!$feets) {
             return null;
+        }
+
+        if (($feets === 'ground') || !is_numeric($feets)) {
+            return 0.0;
         }
 
         if ($feets <= 0) {
@@ -121,8 +141,40 @@ class Airflight
         return (int)$value;
     }
 
+    /**
+     * Crea y devuelve un timestamp restando los segundos recibidos respecto
+     * al momento de construirse la clase para minimizar la diferencia de
+     * tiempo por la ejecución.
+     *
+     * @param int $seconds Segundos a restar.
+     *
+     * @return string
+     */
     private function timestampFromLastSeconds(int $seconds)
     {
-        return $seconds;
+        $now = (clone($this->startAt));
+        $last = (clone($now))->subSeconds($seconds);
+
+        return $last->format('Y-m-d H:i:s');
+    }
+
+    /**
+     * 
+     *
+     * @param mixed $kt Nudos
+     *
+     * @return float|null
+     */
+    private function knotsToMeters($kt)
+    {
+        if (! $kt || ! is_numeric($kt)) {
+            return null;
+        }
+
+        if ($kt <= 0) {
+            return 0.0;
+        }
+
+        return (float) ($kt / 1.94384);
     }
 }
