@@ -9,7 +9,9 @@
         }
     ],
     "minimum-stability": "stable",
-    "require": {},
+    "require": {
+        "nesbot/carbon": "^2.46"
+    },
     "autoload": {
         "classmap": [
             "Helpers",
