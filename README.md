@@ -6,6 +6,22 @@
 - postgresql
 - composer >= 2.0.11
 
+## Datos del json
+
+- hex → ICAO 24 bits (6 dígitos hexadecimales)
+- squawk → Código de transpondedor seleccionado (Señal squawk en representación octal)
+- flight → Nombre del vuelo
+- lat, lon → latitud y longitud con decimales
+- nucp → the NUCp (navigational uncertainty category) reported for the position
+- seen_pos → Tiempo en segundos (antes de ahora) desde el que fue visto por última vez
+- altitude → Altitud en pies, o "ground" si está en tierra
+- vert_rate → Velocidad vertical en pies/minuto
+- track: track verdadero sobre el suelo en grados (0-359)
+- speed: velocidad informada en kt. esto suele ser la velocidad sobre el suelo, pero podría ser ias; no se puede notar la diferencia aquí, ¡lo siento!
+- messages: número total de mensajes de modo s recibidos desde esta aeronave
+- seen: cuánto tiempo (en segundos antes de "ahora") se recibió un mensaje de este avión por última vez
+- rssi: rssi promedio reciente (potencia de señal), en dbfs; esto siempre será negativo.
+
 
 ## Environment Variables 
 
