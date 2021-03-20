@@ -8,13 +8,18 @@ use function array_combine;
 use function array_fill;
 use function array_key_exists;
 use function array_keys;
+use function atan2;
+use function cos;
 use function count;
+use function deg2rad;
 use function implode;
 use function in_array;
 use function is_array;
 use function is_numeric;
 use function is_string;
 use function json_encode;
+use function sin;
+use function sqrt;
 use function trim;
 use function var_dump;
 
@@ -83,6 +88,12 @@ class Airflight
      */
     public $aircraft = [];
 
+    /**
+     * Airflight constructor.
+     *
+     * @param array $datas Json decoded data from /run/dump1090-fa/aircraft.json
+     * @param null  $startAt Read seconds from unix time.
+     */
     public function __construct(Array $datas = [], $startAt = null)
     {
         if ($startAt) {
@@ -205,5 +216,29 @@ class Airflight
         }
 
         return (float) ($kt / 1.94384);
+    }
+
+    /**
+     * Distancia estimada entre el vuelo y el receptor.
+     *
+     * @param $lat_from
+     * @param $lon_from
+     * @param $lat_to
+     * @param $lon_to
+     * @param $earth_radius
+     *
+     * @return float|int
+     */
+    function distanceFromReceptor($lat_from, $lon_from, $lat_to, $lon_to, $earth_radius)
+    {
+        $delta_lat = deg2rad($lat_to - $lat_from);
+        $delta_lon = deg2rad($lon_to - $lon_from);
+
+        $a = sin($delta_lat / 2) * sin($delta_lat / 2) + cos(deg2rad($lat_from)) *
+             cos(deg2rad($lat_to)) * sin($delta_lon / 2) * sin($delta_lon / 2);
+
+        $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+
+        return $earth_radius * $c;
     }
 }
