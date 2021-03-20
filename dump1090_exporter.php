@@ -3,14 +3,10 @@
 namespace App;
 use App\Helpers\Log;
 use App\Models\Airflight;
-use App\Models\Api;
-use App\Models\Configuration;
 use App\Models\Dbconnection;
-use Carbon\Carbon;
 use function define;
 use function file_exists;
-use function var_dump;
-use const PATH_TO_AIRCRAFT_JSON;
+use Symfony\Component\Dotenv\Dotenv;
 
 require 'vendor/autoload.php';
 
