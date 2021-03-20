@@ -2,8 +2,9 @@
 
 ## Dependencias
 
-- php 8.0
+- php >= 8.0
 - postgresql
+- composer >= 2.0.11
 
 
 ## Environment Variables 
