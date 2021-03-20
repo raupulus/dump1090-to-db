@@ -83,7 +83,7 @@ function export()
         Log::info(AIRCRAFT_AVAILABLE);
         $airflight = new Airflight($jsonDataDecode);
 
-        var_dump($airflight);
+        var_dump($airflight->aircraft);
     } else {
         Log::info(AIRCRAFT_NOT_AVAILABLE);
         return false;
