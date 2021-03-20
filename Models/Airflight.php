@@ -2,7 +2,12 @@
 
 namespace App\Models;
 
+use function array_key_exists;
+use function array_keys;
+use function implode;
 use function in_array;
+use function is_array;
+use function json_encode;
 use function var_dump;
 
 /**
@@ -10,21 +15,26 @@ use function var_dump;
  */
 class Airflight
 {
+    /**
+     * Atributos utilizados de los recibidos en el json.
+     *
+     * @var string[]
+     */
     public $attributes = [
-        'hex',
-        'alt_baro',
-        'category',
-        'version',
-        'sil_type',
-        'mlat',
-        'tisb',
-        'seen',
-        'rssi',
-        'alt_geom',
-        'gs',
-        'ias',
-        'tas',
-        'mach'
+        'hex' => [],
+        'category' => [],
+        'alt_baro' => ['feetToMeters'],
+        'version' => [],
+        'sil_type' => [],
+        'mlat' => [],
+        'tisb' => [],
+        'seen' => [],
+        'rssi' => [],
+        'alt_geom' => [],
+        'gs' => [],
+        'ias' => [],
+        'tas' => [],
+        'mach' => [],
     ];
 
     /*
@@ -37,30 +47,43 @@ class Airflight
 
     public function __construct(Array $datas = [])
     {
+        ## Recorre todos los registros de vuelo.
         foreach ($datas['aircraft'] as $aircraft) {
-            // filter $attributes in $array
-
-           // var_dump($aircraft);
+            // TODO → filter $attributes in $array
 
             $data = [];
 
-            ## Recorro todos los registros
-            foreach ($aircraft as $idx => $attribute) {
+            ## Recorro todos los datos para el registro actual.
+            foreach ($aircraft as $key => $attribute) {
 
-                ## Compruebo el atributo actual si quiero almacenarlo
-                if (in_array($idx, $this->attributes)) {
+                ## Compruebo el atributo actual si quiero almacenarlo.
+                if (array_key_exists($key, $this->attributes)) {
 
-                    switch ($attribute) {
-                        case :
+                    $value = $attribute;
+
+                    ## Aplico saneados a cada atributo si lo tuviera.
+                    foreach ($this->attributes[$key] as $validation) {
+                        echo "\n $validation \n";
+                        $value = $this->{$validation}($value);
                     }
 
-                    $data[$idx] = $attribute;
+                    ## Si algo llega como array, lo paso a json.
+                    if (is_array($value)) {
+                        //$value = implode(',', $value);
+                        $value = json_encode($value);
+
+                    }
+
+
+                    $data[$key] = $value;
                 }
             }
 
             if ($data && count($data)) {
                 $this->aircraft[] = $data;
             }
+
+            break;
         }
     }
 
@@ -82,5 +105,11 @@ class Airflight
         }
 
         return (float) ($feets / 3.281);
+    }
+
+
+    private function timestampFromLastSeconds(int $seconds)
+    {
+        
     }
 }
