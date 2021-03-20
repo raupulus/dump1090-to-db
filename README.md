@@ -1,5 +1,24 @@
 # Export to db from dump1090
 
+Store in database dump1090 captures.
+
+Repository [https://gitlab.com/fryntiz/dump1090-to-db.git](https://gitlab.com/fryntiz/dump1090-to-db.git)
+
+## Author
+
+- Name: Raúl Caro Pastorino
+- Web: [fryntiz.es](https://fryntiz.es)
+- Twitter: [@fryntiz](https://twitter.com/fryntiz)
+
+## Features
+
+- [ ] Get data from dump1090 json
+- [x] Autoinstaller DB, create db and table
+- [ ] Autoinstaller php dependencies 
+- [ ] Vars to .env
+- [x] Airflight model
+- [ ] Api upload
+
 ## Dependencias
 
 - php >= 8.0
@@ -36,3 +55,16 @@
 - DEBUG → Debug Enabled
 - T_INTERVAL_CHECK → Interval in seconds between checks for new records
 - T_INTERVAL_UPLOAD_API → Interval in seconds between uploads to the api
+
+## Installation
+
+First, you need set environment vars and software dependencies (sections above).
+
+Next step is execute script **installer.sh**.
+This script create db, tables and resolve composer dependencies.
+
+[https://gitlab.com/fryntiz/dump1090-to-db.git]: https://gitlab.com/fryntiz/dump1090-to-db.git
+
+[https://fryntiz.es]: https://fryntiz.es
+
+[]: https://twitter.com/fryntiz@fryntiz
