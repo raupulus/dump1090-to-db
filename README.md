@@ -65,8 +65,20 @@ First, you need set environment vars and software dependencies (sections above).
 Next step is execute script **installer.sh**.
 This script create db, tables and resolve composer dependencies.
 
-[https://gitlab.com/fryntiz/dump1090-to-db.git]: https://gitlab.com/fryntiz/dump1090-to-db.git
+```bash
+./installer.sh
+```
 
-[https://fryntiz.es]: https://fryntiz.es
+## Manual Start
 
-[]: https://twitter.com/fryntiz@fryntiz
+Method prefer from script:
+
+```bash
+./start_dump1090_exporter.sh
+```
+
+Manual php script execution:
+
+```bash
+php dump1090_exporter.php
+```
