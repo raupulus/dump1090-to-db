@@ -33,15 +33,17 @@ CREATE TABLE reports
     id              BIGSERIAL PRIMARY KEY,
     icao     VARCHAR(100), --hex
     category     VARCHAR(100),
+
     squawk     VARCHAR(100),
     flight     VARCHAR(100),
-    lat     VARCHAR(100),
-    lon     VARCHAR(100),
-    altitude     VARCHAR(100),
-    vert_rate     VARCHAR(100),
-    track     VARCHAR(100),
-    speed     VARCHAR(100),
-    seen_at     VARCHAR(100),
-    rssi     VARCHAR(100),
+    lat     FLOAT,
+    lon     FLOAT,
+    altitude     FLOAT,
+    vert_rate     FLOAT,
+    track     INTEGER,
+    speed     FLOAT,
+    seen_at     TIMESTAMP,
+    messages     INTEGER,
+    rssi     FLOAT,
     emergency VARCHAR(100)
 );

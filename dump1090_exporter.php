@@ -35,7 +35,8 @@ require 'vendor/autoload.php';
 ## Environment vars
 
 define('DEBUG', true);
-define('PATH_TO_AIRCRAFT_JSON', '/run/dump1090-fa/aircraft.json');
+//define('PATH_TO_AIRCRAFT_JSON', '/run/dump1090-fa/aircraft.json');
+define('PATH_TO_AIRCRAFT_JSON', 'test.json');
 
 ## Messages
 

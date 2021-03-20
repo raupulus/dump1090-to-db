@@ -2,6 +2,10 @@
 
 namespace App\Models;
 
+use function array_filter;
+use function array_shift;
+use function count;
+
 /**
  * Class Aircraft
  *
@@ -11,24 +15,6 @@ namespace App\Models;
  */
 class Aircraft
 {
-    private $attributes = [
-        'hex' => 'icao',
-        'category' => 'category',
-        'squawk' => 'squawk',
-        'flight' => 'flight',
-        'lat' => 'lat',
-        'lon' => 'lon',
-        'flight' => 'altitude',
-        'flight' => 'vert_rate',
-        'flight' => 'track',
-        'flight' => 'speed',
-        'flight' => 'seen_at',
-        'flight' => 'rssi',
-        'flight' => 'emergency',
-    ];
-
-    private $data = null;
-
     /**
      * Aircraft constructor.
      *
@@ -58,61 +44,80 @@ class Aircraft
 
     private function setCategory($data)
     {
-        $this->icao = isset($data['hex']) ? $data['hex'] : null;
+        $this->category = isset($data['category']) ? $data['category'] : null;
     }
 
     private function setSquawk($data)
     {
-        $this->icao = isset($data['hex']) ? $data['hex'] : null;
+        $this->squawk = isset($data['squawk']) ? $data['squawk'] : null;
     }
 
     private function setFlight($data)
     {
-        $this->icao = isset($data['hex']) ? $data['hex'] : null;
-    }
-
-    private function setLon($data)
-    {
-        $this->icao = isset($data['hex']) ? $data['hex'] : null;
+        $this->flight = isset($data['flight']) ? $data['flight'] : null;
     }
 
     private function setLat($data)
     {
-        $this->icao = isset($data['hex']) ? $data['hex'] : null;
+        $this->lat = isset($data['lat']) ? $data['lat'] : null;
+    }
+
+    private function setLon($data)
+    {
+        $this->lon = isset($data['lon']) ? $data['lon'] : null;
     }
 
     private function setAltitude($data)
     {
-        $this->icao = isset($data['hex']) ? $data['hex'] : null;
+        $values = [
+            isset($data['altitude']) ? $data['altitude'] : null,
+            isset($data['alt_geom']) ? $data['alt_geom'] : null,
+            isset($data['alt_baro']) ? $data['alt_baro'] : null,
+        ];
+
+        $values = array_filter($values, 'strlen');
+
+        if (count($values)) {
+            $altitude = array_shift($values);
+        } else {
+            $altitude = null;
+        }
+
+        $this->altitude = $altitude;
     }
 
     private function setVertRate($data)
     {
-        $this->icao = isset($data['hex']) ? $data['hex'] : null;
+        $this->vert_rate = isset($data['vert_rate']) ? $data['vert_rate'] : null;
     }
 
     private function setTrack($data)
     {
-        $this->icao = isset($data['hex']) ? $data['hex'] : null;
+        $this->track = isset($data['track']) ? $data['track'] : null;
     }
 
     private function setSpeed($data)
     {
-        $this->icao = isset($data['hex']) ? $data['hex'] : null;
+        $this->speed = isset($data['speed']) ? $data['speed'] : null;
     }
 
     private function setSeenAt($data)
     {
-        $this->icao = isset($data['hex']) ? $data['hex'] : null;
+        $this->seen_at = isset($data['seen']) ? $data['seen'] : null;
+    }
+
+    private function setMessages($data)
+    {
+        $this->messages = isset($data['messages']) ? $data['messages'] : null;
     }
 
     private function setRssi($data)
     {
-        $this->icao = isset($data['hex']) ? $data['hex'] : null;
+        $this->rssi = isset($data['rssi']) ? $data['rssi'] : null;
     }
 
     private function setEmergency($data)
     {
-        $this->icao = isset($data['hex']) ? $data['hex'] : null;
+        $this->emergency = isset($data['emergency']) ? $data['emergency'] : null;
     }
 }

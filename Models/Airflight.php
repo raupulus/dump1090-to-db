@@ -81,6 +81,7 @@ class Airflight
         'nic_baro' => [],
         'gva' => [],
         'sda' => [],
+        'messages' => ['toInt'],
     ];
 
     /*
@@ -91,20 +92,20 @@ class Airflight
     /**
      * Airflight constructor.
      *
-     * @param array $datas Json decoded data from /run/dump1090-fa/aircraft.json
+     * @param array $datas Json decoded data like /run/dump1090-fa/aircraft.json
      * @param null  $startAt Read seconds from unix time.
      */
     public function __construct(Array $datas = [], $startAt = null)
     {
         if ($startAt) {
             try {
-                $startAt = Carbon::createFromTimestamp($startAt);
+                $startAt = Carbon::createFromTimestamp($startAt, 'UTC');
             } catch (Exception $e) {
                 $startAt = null;
             }
         }
 
-        $this->startAt = $startAt ?? Carbon::now();
+        $this->startAt = $startAt ?? Carbon::now('UTC');
 
         ## Recorre todos los registros de vuelo.
         foreach ($datas['aircraft'] as $aircraft) {
@@ -140,7 +141,10 @@ class Airflight
             }
 
             if ($data && count($data)) {
-                $this->aircraft[] = $data;
+                var_dump($data);
+                echo "\n";
+
+                $this->aircraft[] = new Aircraft($data);
             }
         }
     }
