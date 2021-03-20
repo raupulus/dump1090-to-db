@@ -14,11 +14,12 @@ Repository [https://gitlab.com/fryntiz/dump1090-to-db.git](https://gitlab.com/fr
 
 - [x] Autoinstaller DB, create db and table
 - [x] Airflight model
-- [ ] Get data from dump1090 json
-- [ ] Autoinstaller php dependencies 
-- [ ] Vars to .env
+- [x] Get data from dump1090 json
+- [x] Autoinstaller php dependencies 
+- [ ] Save data to postgresql DB
 - [ ] Api upload
 - [ ] Create Daemon Service
+- [ ] Vars to .env
 
 ## Dependencias
 

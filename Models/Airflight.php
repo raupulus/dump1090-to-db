@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Carbon\Carbon;
+use Exception;
 use function array_combine;
 use function array_fill;
 use function array_key_exists;
@@ -85,10 +86,14 @@ class Airflight
     public function __construct(Array $datas = [], $startAt = null)
     {
         if ($startAt) {
-
-        } else {
-            $this->startAt = Carbon::now();
+            try {
+                $startAt = Carbon::createFromTimestamp($startAt);
+            } catch (Exception $e) {
+                $startAt = null;
+            }
         }
+
+        $this->startAt = $startAt ?? Carbon::now();
 
         ## Recorre todos los registros de vuelo.
         foreach ($datas['aircraft'] as $aircraft) {
@@ -106,7 +111,6 @@ class Airflight
                     if ($value) {
                         ## Aplico saneados a cada atributo si lo tuviera.
                         foreach ($this->attributes[$key] as $validation) {
-                            echo "\n $validation \n";
                             $value = $this->{$validation}($value);
                         }
 
