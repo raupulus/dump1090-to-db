@@ -1,6 +1,8 @@
 <?php
 namespace App\Models;
 
+use PDO;
+
 /**
  * Clase que representa la conexión con la db y devuelve las colecciones de
  * consultas con instancias de sus modelos.
@@ -23,7 +25,11 @@ class Dbconnection
         'OPTIONS' => [PDO::ATTR_PERSISTENT => true],
     ];
 
-
+    /**
+     * Dbconnection constructor.
+     *
+     * @param array $params
+     */
     public function __construct($params = [])
     {
         ## Mezclo parámetros de conexión para la DB con los internos.
@@ -42,7 +48,7 @@ class Dbconnection
     /**
      * Inicia la conexión con la DB.
      *
-     * @return \app\models\PDO|null Devuelve la conexión con la DB o null
+     * @return \PDO|null Devuelve la conexión con la DB o null
      */
     private function connect()
     {

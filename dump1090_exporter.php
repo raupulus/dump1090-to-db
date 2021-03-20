@@ -7,6 +7,7 @@ use App\Models\Dbconnection;
 use function define;
 use function file_exists;
 use Symfony\Component\Dotenv\Dotenv;
+use function var_dump;
 
 require 'vendor/autoload.php';
 
@@ -28,11 +29,14 @@ require 'vendor/autoload.php';
 
  */
 
+## Overwrite existing env variables
+$dotenv = new Dotenv();
+$dotenv->overload(__DIR__.'/.env');
+
 ## Environment vars
 
-define('DEBUG', true);
-//define('PATH_TO_AIRCRAFT_JSON', '/run/dump1090-fa/aircraft.json');
-define('PATH_TO_AIRCRAFT_JSON', 'test.json');
+define('DEBUG', isset($_ENV['DEBUG']) ? $_ENV['DEBUG'] : true);
+define('PATH_TO_AIRCRAFT_JSON', isset($_ENV['PATH_TO_AIRCRAFT_JSON']) ? $_ENV['PATH_TO_AIRCRAFT_JSON'] : '/run/dump1090-fa/aircraft.json');
 
 ## Messages
 
@@ -43,12 +47,14 @@ define('AIRCRAFT_NOT_AVAILABLE', 'No hay registro de vuelos');
 
 ## DB
 
-define('DB_CONNECTION', 'psql');
-define('DB_HOST', '127.0.0.1');
-define('DB_PORT', '5432');
-define('DB_DATABASE', 'dump1090');
-define('DB_USERNAME', 'dbuser');
-define('DB_PASSWORD', 'dbpassword');
+define('DB_CONNECTION', isset($_ENV['DB_CONNECTION']) ? $_ENV['DB_CONNECTION'] : 'psql');
+define('DB_HOST', isset($_ENV['DB_HOST']) ? $_ENV['DB_HOST'] : '127.0.0.1');
+define('DB_PORT', isset($_ENV['DB_PORT']) ? $_ENV['DB_PORT'] : '5432');
+define('DB_DATABASE', isset($_ENV['DB_DATABASE']) ? $_ENV['DB_DATABASE'] : 'dump1090');
+define('DB_USERNAME', isset($_ENV['DB_USERNAME']) ? $_ENV['DB_USERNAME'] : 'dbuser');
+define('DB_PASSWORD', isset($_ENV['DB_PASSWORD']) ? $_ENV['DB_PASSWORD'] : '');
+
+
 
 /**
  * Comprueba si existe el archivo json.
@@ -106,6 +112,9 @@ function export()
             'DB_USER' => DB_USERNAME,
             'DB_PASSWORD' => DB_PASSWORD,
         ]);
+
+        var_dump($db); die();
+
     } else {
         Log::info(AIRCRAFT_NOT_AVAILABLE);
         return false;
