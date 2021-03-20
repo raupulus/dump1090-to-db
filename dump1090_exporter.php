@@ -45,7 +45,14 @@ define('JSON_FILE_NOT_EXIST', 'No existe el archivo JSON');
 define('AIRCRAFT_AVAILABLE', 'Hay registro de vuelos');
 define('AIRCRAFT_NOT_AVAILABLE', 'No hay registro de vuelos');
 
+## DB
 
+define('DB_CONNECTION', 'psql');
+define('DB_HOST', '127.0.0.1');
+define('DB_PORT', '5432');
+define('DB_DATABASE', 'dump1090');
+define('DB_USERNAME', 'dbuser');
+define('DB_PASSWORD', 'dbpassword');
 
 /**
  * Comprueba si existe el archivo json.
@@ -93,7 +100,16 @@ function export()
             $airflight = new Airflight($jsonData);
         }
 
-        var_dump($airflight->aircraft);
+        //var_dump($airflight->aircraft);
+
+        $db = new Dbconnection([
+            'DB_SGBD' => DB_CONNECTION,
+            'DB_HOST' => DB_HOST,
+            'DB_PORT' => DB_PORT,
+            'DB_NAME' => DB_DATABASE,
+            'DB_USER' => DB_USERNAME,
+            'DB_PASSWORD' => DB_PASSWORD,
+        ]);
     } else {
         Log::info(AIRCRAFT_NOT_AVAILABLE);
         return false;
