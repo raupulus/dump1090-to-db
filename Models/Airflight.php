@@ -3,13 +3,18 @@
 namespace App\Models;
 
 use Carbon\Carbon;
+use function array_combine;
+use function array_fill;
 use function array_key_exists;
 use function array_keys;
+use function count;
 use function implode;
 use function in_array;
 use function is_array;
 use function is_numeric;
+use function is_string;
 use function json_encode;
+use function trim;
 use function var_dump;
 
 /**
@@ -17,14 +22,17 @@ use function var_dump;
  */
 class Airflight
 {
+    /**
+     * Almacena la fecha en la que se construye este modelo.
+     *
+     * @var \Carbon\Carbon
+     */
     private $startAt;
 
     /**
      * Atributos utilizados de los recibidos en el json.
      * Cada atributo es la clave que se asocia a un array de validaciones con
      * el nombre de cada función para validarlas en el mismo orden.
-     *
-     * @var string[]
      */
     public $attributes = [
         'hex' => [],
@@ -34,64 +42,83 @@ class Airflight
         'lat' => [],
         'lon' => [],
         'nucp' => [],
+        'nic' => [],
+        'rc' => [],
         'alt_baro' => ['feetToMeters'],
+        'alt_geom' => ['feetToMeters'],
+        'baro_rate' => [],
+        'geom_rate' => [],
         'altitude' => ['feetToMeters'],
         'vert_rate' => ['feetToMeters'],
-        'track' => ['toInt'],
+        'track' => [],
+        'track_rate' => [],
         'speed' => ['knotsToMeters'],
         'version' => [],
         'sil_type' => [],
         'mlat' => [],
         'tisb' => [],
-        'seen' => ['toInt', 'timestampFromLastSeconds'],
-        'seen_pos' => ['toInt', 'timestampFromLastSeconds'],
+        'seen' => ['timestampFromLastSeconds'],
+        'seen_pos' => ['timestampFromLastSeconds'],
         'rssi' => [],
-        'alt_geom' => [],
         'gs' => [],
         'ias' => [],
         'tas' => [],
         'mach' => [],
+        'nac_p' => [],
+        'nac_v' => [],
+        'sil' => [],
+        'roll' => [],
+        'mag_heading' => [],
+        'emergency' => [],
+        'nav_qnh' => [],
+        'nav_altitude_mcp' => [],
+        'nic_baro' => [],
+        'gva' => [],
+        'sda' => [],
     ];
 
     /*
-{"hex":"4ca9c2","flight":"RYR8RR  ","alt_baro":9650,"alt_geom":10275,"gs":287.8,"ias":251,"tas":292,"mach":0.452,"track":6.4,"track_rate":0.00,"roll":0.4,"mag_heading":9.7,"baro_rate":-1408,"geom_rate":-1408,"category":"A3","nav_qnh":1023.2,"nav_altitude_mcp":2016,"nav_heading":9.1,"lat":36.965130,"lon":-6.141596,"nic":8,"rc":186,"seen_pos":60.7,"version":2,"nic_baro":1,"nac_p":8,"nac_v":1,"sil":3,"sil_type":"perhour","gva":1,"sda":2,"mlat":[],"tisb":[],"messages":2334,"seen":54.6,"rssi":-24.8},
-*/
-
-
-
+     * Almacena todos los vuelos detectados una vez se ha limpiado.
+     */
     public $aircraft = [];
 
-    public function __construct(Array $datas = [])
+    public function __construct(Array $datas = [], $startAt = null)
     {
-        $this->startAt = Carbon::now();
+        if ($startAt) {
+
+        } else {
+            $this->startAt = Carbon::now();
+        }
 
         ## Recorre todos los registros de vuelo.
         foreach ($datas['aircraft'] as $aircraft) {
-            // TODO → filter $attributes in $array
 
-            $data = [];
+            ## Creo un array con todos los atributos en valor null
+            $data = array_combine(array_keys($this->attributes), array_fill(0, count($this->attributes), null));
 
             ## Recorro todos los datos para el registro actual.
             foreach ($aircraft as $key => $attribute) {
 
                 ## Compruebo el atributo actual si quiero almacenarlo.
                 if (array_key_exists($key, $this->attributes)) {
+                    $value = $attribute ?? null;
 
-                    $value = $attribute;
+                    if ($value) {
+                        ## Aplico saneados a cada atributo si lo tuviera.
+                        foreach ($this->attributes[$key] as $validation) {
+                            echo "\n $validation \n";
+                            $value = $this->{$validation}($value);
+                        }
 
-                    ## Aplico saneados a cada atributo si lo tuviera.
-                    foreach ($this->attributes[$key] as $validation) {
-                        echo "\n $validation \n";
-                        $value = $this->{$validation}($value);
+                        ## Si algo llega como array, lo paso a json.
+                        if (is_array($value)) {
+                            $value = json_encode($value);
+                        }
+
+                        if (is_string($value)) {
+                            $value = trim($value);
+                        }
                     }
-
-                    ## Si algo llega como array, lo paso a json.
-                    if (is_array($value)) {
-                        //$value = implode(',', $value);
-                        $value = json_encode($value);
-
-                    }
-
 
                     $data[$key] = $value;
                 }
@@ -100,8 +127,6 @@ class Airflight
             if ($data && count($data)) {
                 $this->aircraft[] = $data;
             }
-
-            break;
         }
     }
 
@@ -146,11 +171,11 @@ class Airflight
      * al momento de construirse la clase para minimizar la diferencia de
      * tiempo por la ejecución.
      *
-     * @param int $seconds Segundos a restar.
+     * @param numeric $seconds Segundos a restar.
      *
      * @return string
      */
-    private function timestampFromLastSeconds(int $seconds)
+    private function timestampFromLastSeconds($seconds)
     {
         $now = (clone($this->startAt));
         $last = (clone($now))->subSeconds($seconds);
@@ -159,7 +184,7 @@ class Airflight
     }
 
     /**
-     * 
+     * Convierte de nudos a metros.
      *
      * @param mixed $kt Nudos
      *
