@@ -17,6 +17,8 @@ class Airflight
 {
     /**
      * Atributos utilizados de los recibidos en el json.
+     * Cada atributo es la clave que se asocia a un array de validaciones con
+     * el nombre de cada función para validarlas en el mismo orden.
      *
      * @var string[]
      */
@@ -28,7 +30,7 @@ class Airflight
         'sil_type' => [],
         'mlat' => [],
         'tisb' => [],
-        'seen' => [],
+        'seen' => ['toInt', 'timestampFromLastSeconds'],
         'rssi' => [],
         'alt_geom' => [],
         'gs' => [],
@@ -107,9 +109,20 @@ class Airflight
         return (float) ($feets / 3.281);
     }
 
+    /**
+     * Recibe un valor e intentar convertirlo en entero.
+     *
+     * @param mixed $value Valor a convertir.
+     *
+     * @return int
+     */
+    private function toInt($value)
+    {
+        return (int)$value;
+    }
 
     private function timestampFromLastSeconds(int $seconds)
     {
-        
+        return $seconds;
     }
 }
