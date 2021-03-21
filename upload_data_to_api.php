@@ -6,6 +6,7 @@ use App\Models\Dbconnection;
 use Exception;
 use Symfony\Component\Dotenv\Dotenv;
 use function define;
+use function json_encode;
 use function var_dump;
 use const API_TOKEN;
 use const API_URL;
@@ -102,10 +103,11 @@ function deleteDbData($datas)
     return $db ? $db->deleteAirflight($data) : null;
 }
 
-function uploadToApi()
+function uploadToApi($data)
 {
     $url = API_URL;
     $token = API_TOKEN;
+    $parameters = json_encode($data);
     $headers = [
         "Accept: application/json",
         "Authorization: Bearer $token",
@@ -116,6 +118,7 @@ function uploadToApi()
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
     curl_setopt($curl, CURLOPT_POST, true);
+    curl_setopt($curl, CURLOPT_POSTFIELDS, $parameters);
 
     $resp = curl_exec($curl);
 
