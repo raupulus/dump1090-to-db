@@ -2,6 +2,7 @@
 namespace App\Models;
 
 use PDO;
+use function implode;
 use function var_dump;
 
 /**
@@ -217,6 +218,37 @@ EOL;
                 $this->execute($query);
             }
         }
+    }
+
+    public function getLastAirflights($limit = 10)
+    {
+
+    }
+
+    /**
+     * Elimina los registros de vuelos recibidos.
+     *
+     * @param array $ids Array con el id de los elementos a borrar.
+     *
+     * @return null
+     */
+    public function deleteAirflight(array $ids)
+    {
+        $idsString = implode(',', $ids);
+
+        $query = <<<EOL
+            DELETE FROM reports
+            WHERE id IN $idsString
+            ;
+EOL;
+
+        if ($query) {
+            echo "Eliminando: $query";
+
+            return $this->execute($query);
+        }
+
+        return null;
     }
 
     /**

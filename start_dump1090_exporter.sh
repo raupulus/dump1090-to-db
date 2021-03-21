@@ -8,16 +8,14 @@ do
 
     count=$((count + 1))
 
-    sleep 10
-
     ## Cada 10 iteraciones sube a la api todo lo que haya
     if [[ $count = 10 ]]; then
         echo 'Subiendo a la api'
 
         count=0
 
-        php upload_data_to_api.php
-
-        sleep 20
+        #php upload_data_to_api.php
+    else
+        sleep 10
     fi
 done

@@ -10,10 +10,10 @@ CREATE TABLE reports
     flight     VARCHAR(100) NULL,
     lat     FLOAT NULL,
     lon     FLOAT NULL,
-    altitude     FLOAT NULL,
-    vert_rate     FLOAT NULL,
+    altitude     FLOAT NULL, -- m
+    vert_rate     FLOAT NULL, -- m
     track     INTEGER NULL,
-    speed     FLOAT NULL,
+    speed     FLOAT NULL, -- mps
     seen_at     TIMESTAMP NULL,
     messages     INTEGER NULL,
     rssi     FLOAT NULL,
