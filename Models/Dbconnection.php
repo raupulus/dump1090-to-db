@@ -213,16 +213,36 @@ EOL;
 EOL;
 
             if ($query) {
-                echo "Insertando: $query";
+                echo "Insertando:\n $query";
 
                 $this->execute($query);
             }
         }
     }
 
+    /**
+     * Obtiene los últimos vuelos limitados a la cantidad recibida.
+     *
+     * @param int $limit Cantidad de vuelos a recibir.
+     *
+     * @return null
+     */
     public function getLastAirflights($limit = 10)
     {
+        $query = <<<EOL
+            SELECT * FROM reports
+            ORDER BY seen_at DESC
+            LIMIT $limit
+            ;
+EOL;
 
+        if ($query) {
+            echo "Consultando:\n $query";
+
+            return $this->execute($query);
+        }
+
+        return null;
     }
 
     /**
