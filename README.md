@@ -17,7 +17,7 @@ Repository [https://gitlab.com/fryntiz/dump1090-to-db.git](https://gitlab.com/fr
 - [x] Get data from dump1090 json
 - [x] Autoinstaller php dependencies 
 - [x] Vars from .env
-- [ ] Save data to postgresql DB
+- [x] Save data to postgresql DB
 - [ ] Api upload
 - [ ] Create Daemon Service
 

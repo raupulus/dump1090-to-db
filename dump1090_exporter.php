@@ -4,6 +4,8 @@ namespace App;
 use App\Helpers\Log;
 use App\Models\Airflight;
 use App\Models\Dbconnection;
+use Exception;
+use function count;
 use function define;
 use function file_exists;
 use Symfony\Component\Dotenv\Dotenv;
@@ -44,6 +46,7 @@ define('JSON_FILE_EXIST', 'El archivo JSON existe');
 define('JSON_FILE_NOT_EXIST', 'No existe el archivo JSON');
 define('AIRCRAFT_AVAILABLE', 'Hay registro de vuelos');
 define('AIRCRAFT_NOT_AVAILABLE', 'No hay registro de vuelos');
+define('DB_ERROR_CONNECTION', 'Error al conectar con la base de datos');
 
 ## DB
 
@@ -104,17 +107,26 @@ function export()
 
         //var_dump($airflight->aircraft);
 
-        $db = new Dbconnection([
-            'DB_SGBD' => DB_CONNECTION,
-            'DB_HOST' => DB_HOST,
-            'DB_PORT' => DB_PORT,
-            'DB_NAME' => DB_DATABASE,
-            'DB_USER' => DB_USERNAME,
-            'DB_PASSWORD' => DB_PASSWORD,
-        ]);
+        $aircrafts = $airflight->aircraft;
 
-        var_dump($db); die();
+        if ($aircrafts && count($aircrafts)) {
+            try {
+                $db = new Dbconnection([
+                    'DB_SGBD' => \DB_CONNECTION,
+                    'DB_HOST' => \DB_HOST,
+                    'DB_PORT' => \DB_PORT,
+                    'DB_NAME' => \DB_DATABASE,
+                    'DB_USER' => \DB_USERNAME,
+                    'DB_PASSWORD' => \DB_PASSWORD,
+                ]);
+            } catch (Exception $e) {
+                Log::error(DB_ERROR_CONNECTION);
 
+                return false;
+            }
+
+            $db->saveAirflight($airflight->aircraft);
+        }
     } else {
         Log::info(AIRCRAFT_NOT_AVAILABLE);
         return false;

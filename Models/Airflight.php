@@ -66,9 +66,9 @@ class Airflight
         'seen' => ['timestampFromLastSeconds'],
         'seen_pos' => ['timestampFromLastSeconds'],
         'rssi' => [],
-        'gs' => [],
-        'ias' => [],
-        'tas' => [],
+        'gs' => ['knotsToMeters'],
+        'ias' => ['knotsToMeters'],
+        'tas' => ['knotsToMeters'],
         'mach' => [],
         'nac_p' => [],
         'nac_v' => [],
@@ -97,6 +97,7 @@ class Airflight
      */
     public function __construct(Array $datas = [], $startAt = null)
     {
+        var_dump($datas);
         if ($startAt) {
             try {
                 $startAt = Carbon::createFromTimestamp($startAt, 'UTC');
@@ -141,9 +142,6 @@ class Airflight
             }
 
             if ($data && count($data)) {
-                var_dump($data);
-                echo "\n";
-
                 $this->aircraft[] = new Aircraft($data);
             }
         }

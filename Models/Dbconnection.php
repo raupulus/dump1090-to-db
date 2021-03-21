@@ -2,6 +2,7 @@
 namespace App\Models;
 
 use PDO;
+use function var_dump;
 
 /**
  * Clase que representa la conexión con la db y devuelve las colecciones de
@@ -19,7 +20,6 @@ class Dbconnection
         'DB_PORT' => '5432',
         'DB_NAME' => 'dump1090',
         'DB_USER' => 'admin',
-        'DB_CHARSET' => 'utf8mb4',
         'DB_COLLATE' => '',
         'DB_PASSWORD' => '',
         'OPTIONS' => [PDO::ATTR_PERSISTENT => true],
@@ -41,7 +41,7 @@ class Dbconnection
         do {
             $try++;
             $this->dbh = $this->connect();
-            usleep(80);  ## Pausa en milisegundos.
+            usleep(300);  ## Pausa en milisegundos.
         } while (($this->dbh === null) && ($try <= 10));
     }
 
@@ -56,8 +56,7 @@ class Dbconnection
             $params = $this->params;
             $conn = $params['DB_SGBD'] . ":host=" . $params['DB_HOST'] . ";" .
                 "dbname=" . $params['DB_NAME'] . ";" .
-                "port=" . $params['DB_PORT'] . ";" .
-                "charset=" . $params['DB_CHARSET'] . ";";
+                "port=" . $params['DB_PORT'] . ";";
 
             return new PDO(
                 $conn,
@@ -87,7 +86,9 @@ class Dbconnection
                 if ($q) {
                     return $q;
                 }
-            } catch (\Exception $e) {}
+            } catch (\Exception $e) {
+                var_dump($e);
+            }
         }
 
         return null;
@@ -144,30 +145,76 @@ EOL;
     /**
      * Insert all elements
      *
-     * @param array $rows
+     * @param Object $rows
      *
      * @return array
      */
-    public function insert(Array $rows)
+    public function insert(string $table, Object $rows)
     {
 
         $inserts = 0;
 
         foreach ($rows as $row) {
             $query = <<<EOL
-            INSERT
+            INSERT INTO $table
             VALUES
+                
 EOL;
             if ($this->execute($query)) {
                 $inserts++;
             }
         }
 
-
-
         return [
             'inserts' => $inserts,
         ];
+    }
+
+    /**
+     * Almacena los elementos recibidos.
+     *
+     * @param $airflights
+     */
+    public function saveAirflight($airflights)
+    {
+        foreach ($airflights as $airflight) {
+
+            $lon = $airflight->lon ?? 'null';
+            $lat = $airflight->lat ?? 'null';
+            $altitude = $airflight->altitude ?? 'null';
+            $vert_rate = $airflight->vert_rate ?? 'null';
+            $track = $airflight->track ?? 'null';
+            $rssi = $airflight->rssi ?? 'null';
+            $speed = $airflight->speed ?? 'null';
+
+            $query = <<<EOL
+            INSERT INTO reports (icao, category, squawk, flight, lon, lat,
+                                 altitude, vert_rate, track, speed, seen_at, 
+                                 rssi, emergency)
+            VALUES 
+            (
+                '$airflight->icao', 
+                '$airflight->category',
+                '$airflight->squawk',
+                '$airflight->flight',
+                $lon,
+                $lat,
+                $altitude,
+                $vert_rate,
+                $track,
+                $speed,
+                '$airflight->seen_at',
+                $rssi,
+                '$airflight->emergency'
+            );
+EOL;
+
+            if ($query) {
+                echo "Insertando: $query";
+
+                $this->execute($query);
+            }
+        }
     }
 
     /**

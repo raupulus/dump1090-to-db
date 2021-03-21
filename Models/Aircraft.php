@@ -98,7 +98,22 @@ class Aircraft
 
     private function setSpeed($data)
     {
-        $this->speed = isset($data['speed']) ? $data['speed'] : null;
+        $values = [
+            isset($data['speed']) ? $data['speed'] : null,
+            isset($data['gs']) ? $data['gs'] : null,
+            isset($data['tas']) ? $data['tas'] : null,
+            isset($data['ias']) ? $data['ias'] : null,
+        ];
+
+        $values = array_filter($values, 'strlen');
+
+        if (count($values)) {
+            $speed = array_shift($values);
+        } else {
+            $speed = null;
+        }
+
+        $this->speed = $speed;
     }
 
     private function setSeenAt($data)
