@@ -106,17 +106,16 @@ function uploadToApi()
 {
     $url = API_URL;
     $token = API_TOKEN;
-
-    $curl = curl_init($url);
-    curl_setopt($curl, CURLOPT_URL, $url);
-    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-
     $headers = [
         "Accept: application/json",
         "Authorization: Bearer $token",
     ];
 
+    $curl = curl_init($url);
+    curl_setopt($curl, CURLOPT_URL, $url);
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+    curl_setopt($curl, CURLOPT_POST, true);
 
     $resp = curl_exec($curl);
 
@@ -125,7 +124,7 @@ function uploadToApi()
     echo "\n RESPUESTA API \n";
     var_dump($resp); die();
 
-    return true;
+    return $resp;
 }
 
 function start()
