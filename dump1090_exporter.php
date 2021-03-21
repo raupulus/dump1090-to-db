@@ -95,14 +95,18 @@ function export()
 
         $jsonData = importJson();
     } else {
-        Log::error(JSON_FILE_NOT_EXIST);
+        if (DEBUG) {
+            Log::error(JSON_FILE_NOT_EXIST);
+        }
 
         return false;
     }
 
     ## Check json data.
     if ($jsonData && isset($jsonData['aircraft'])) {
-        Log::info(AIRCRAFT_AVAILABLE);
+        if (DEBUG) {
+            Log::info(AIRCRAFT_AVAILABLE);
+        }
 
         $now = isset($jsonData['now']) ? $jsonData['now'] : null;
 
@@ -112,22 +116,22 @@ function export()
             $airflight = new Airflight($jsonData);
         }
 
-        //var_dump($airflight->aircraft);
-
         $aircrafts = $airflight->aircraft;
 
         if ($aircrafts && count($aircrafts)) {
             try {
                 $db = new Dbconnection([
-                    'DB_SGBD' => \DB_CONNECTION,
-                    'DB_HOST' => \DB_HOST,
-                    'DB_PORT' => \DB_PORT,
-                    'DB_NAME' => \DB_DATABASE,
-                    'DB_USER' => \DB_USERNAME,
-                    'DB_PASSWORD' => \DB_PASSWORD,
+                    'DB_SGBD' => DB_CONNECTION,
+                    'DB_HOST' => DB_HOST,
+                    'DB_PORT' => DB_PORT,
+                    'DB_NAME' => DB_DATABASE,
+                    'DB_USER' => DB_USERNAME,
+                    'DB_PASSWORD' => DB_PASSWORD,
                 ]);
             } catch (Exception $e) {
-                Log::error(DB_ERROR_CONNECTION);
+                if (DEBUG) {
+                    Log::error(DB_ERROR_CONNECTION);
+                }
 
                 return false;
             }
@@ -135,7 +139,10 @@ function export()
             $db->saveAirflight($airflight->aircraft);
         }
     } else {
-        Log::info(AIRCRAFT_NOT_AVAILABLE);
+        if (DEBUG) {
+            Log::info(AIRCRAFT_NOT_AVAILABLE);
+        }
+
         return false;
     }
 }

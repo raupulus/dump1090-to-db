@@ -33,6 +33,7 @@ class Aircraft
         $this->setTrack($data);
         $this->setSpeed($data);
         $this->setSeenAt($data);
+        $this->setMessages($data);
         $this->setRssi($data);
         $this->setEmergency($data);
     }

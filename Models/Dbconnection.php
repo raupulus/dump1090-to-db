@@ -186,11 +186,12 @@ EOL;
             $track = $airflight->track ?? 'null';
             $rssi = $airflight->rssi ?? 'null';
             $speed = $airflight->speed ?? 'null';
+            $messages = $airflight->messages ?? 'null';
 
             $query = <<<EOL
             INSERT INTO reports (icao, category, squawk, flight, lon, lat,
-                                 altitude, vert_rate, track, speed, seen_at, 
-                                 rssi, emergency)
+                                 altitude, vert_rate, track, speed, messages,
+                                 seen_at, rssi, emergency)
             VALUES 
             (
                 '$airflight->icao', 
@@ -203,6 +204,7 @@ EOL;
                 $vert_rate,
                 $track,
                 $speed,
+                $messages,
                 '$airflight->seen_at',
                 $rssi,
                 '$airflight->emergency'
