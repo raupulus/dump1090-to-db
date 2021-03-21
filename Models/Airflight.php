@@ -197,7 +197,9 @@ class Airflight
         $now = (clone($this->startAt));
         $last = (clone($now))->subSeconds($seconds);
 
-        return $last->format('Y-m-d H:i:s');
+        $format = $last->format('Y-m-d H:i:s');
+
+        return $format && $format != 0 && $format != '0' ? $format : '';
     }
 
     /**

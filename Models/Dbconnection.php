@@ -88,6 +88,7 @@ class Dbconnection
                     return $q;
                 }
             } catch (\Exception $e) {
+                echo "\n Error en la consulta, función execute() \n";
                 var_dump($e);
             }
         }
@@ -121,7 +122,7 @@ EOL;
 
     /**
      * Devuelve todos los parámetros de conexión a la DB.
-     * @return Array Parámetros de configuración para la DB.
+     * @return array Parámetros de configuración para la DB.
      */
     public function getParameters()
     {
@@ -158,7 +159,7 @@ EOL;
         foreach ($rows as $row) {
             $query = <<<EOL
             INSERT INTO $table
-            VALUES
+            VALUES $row
                 
 EOL;
             if ($this->execute($query)) {
@@ -227,7 +228,7 @@ EOL;
      *
      * @return null
      */
-    public function getLastAirflights($limit = 10)
+    public function getLastsAirflight($limit = 10)
     {
         $query = <<<EOL
             SELECT * FROM reports

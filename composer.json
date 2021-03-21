@@ -12,7 +12,8 @@
     "require": {
         "nesbot/carbon": "^2.46",
         "symfony/dotenv": "^5.2",
-      "ext-pdo": "*"
+      "ext-pdo": "*",
+      "ext-curl": "*"
     },
     "autoload": {
         "classmap": [
