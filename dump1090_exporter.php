@@ -9,16 +9,12 @@ use function count;
 use function define;
 use function file_exists;
 use Symfony\Component\Dotenv\Dotenv;
-use function var_dump;
 
 require 'vendor/autoload.php';
 
-
-
-// JSON
+// JSON EXAMPLE
 
 /*
-
 { "now" : 1615755572.8,
   "messages" : 102260,
   "aircraft" : [
@@ -28,7 +24,6 @@ require 'vendor/autoload.php';
     {"hex":"346183","category":"A3","version":2,"sil_type":"perhour","mlat":[],"tisb":[],"messages":435,"seen":75.4,"rssi":-27.1}
   ]
 }
-
  */
 
 ## Overwrite existing env variables
@@ -57,8 +52,6 @@ define('DB_DATABASE', isset($_ENV['DB_DATABASE']) ? $_ENV['DB_DATABASE'] : 'dump
 define('DB_USERNAME', isset($_ENV['DB_USERNAME']) ? $_ENV['DB_USERNAME'] : 'dbuser');
 define('DB_PASSWORD', isset($_ENV['DB_PASSWORD']) ? $_ENV['DB_PASSWORD'] : '');
 
-
-
 /**
  * Comprueba si existe el archivo json.
  *
@@ -69,6 +62,11 @@ function jsonExist()
     return file_exists(PATH_TO_AIRCRAFT_JSON);
 }
 
+/**
+ * Import json data from dump1090 file.
+ *
+ * @return mixed|null
+ */
 function importJson()
 {
     $fileContent = file_get_contents(PATH_TO_AIRCRAFT_JSON);
@@ -82,10 +80,18 @@ function importJson()
     return  $json;
 }
 
+/**
+ * Main function to export data from dump1090 to db.
+ *
+ * @return false
+ */
 function export()
 {
+    ## Check json exist.
     if (jsonExist()) {
-        Log::success(JSON_FILE_EXIST);
+        if (DEBUG) {
+            Log::success(\JSON_FILE_EXIST);
+        }
 
         $jsonData = importJson();
     } else {
@@ -94,6 +100,7 @@ function export()
         return false;
     }
 
+    ## Check json data.
     if ($jsonData && isset($jsonData['aircraft'])) {
         Log::info(AIRCRAFT_AVAILABLE);
 
