@@ -5,11 +5,16 @@ use App\Helpers\Log;
 use App\Models\Dbconnection;
 use Exception;
 use Symfony\Component\Dotenv\Dotenv;
+use function curl_setopt;
 use function define;
+use function http_build_query;
 use function json_encode;
 use function var_dump;
 use const API_TOKEN;
 use const API_URL;
+use const CURLOPT_HTTPHEADER;
+use const CURLOPT_POST;
+use const CURLOPT_POSTFIELDS;
 use const DB_ERROR_CONNECTION;
 use const DEBUG;
 
@@ -107,24 +112,32 @@ function uploadToApi($data)
 {
     $url = API_URL;
     $token = API_TOKEN;
-    $parameters = json_encode($data);
+
+
+    $parameters = json_encode([
+        'data' => $data
+    ]);
+
     $headers = [
-        "Accept: application/json",
-        "Authorization: Bearer $token",
+        'Accept: application/json',
+        'Content-Type: application/json',
+        'Authorization: Bearer ' . $token,
+        //'Content-length: ' . strlen($parameters),
     ];
 
     $curl = curl_init($url);
     curl_setopt($curl, CURLOPT_URL, $url);
-    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
     curl_setopt($curl, CURLOPT_POST, true);
     curl_setopt($curl, CURLOPT_POSTFIELDS, $parameters);
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
 
     $resp = curl_exec($curl);
 
     curl_close($curl);
 
     echo "\n RESPUESTA API \n";
+    //var_dump(curl_getinfo($curl));
     var_dump($resp); die();
 
     return $resp;
