@@ -8,6 +8,7 @@ use Symfony\Component\Dotenv\Dotenv;
 use function curl_setopt;
 use function define;
 use function http_build_query;
+use function in_array;
 use function json_encode;
 use function var_dump;
 use const API_TOKEN;
@@ -83,15 +84,27 @@ function getDbData()
     $db = getDbConnection();
 
     $datas =  $db ? $db->getLastsAirflight(10) : null;
-    
+
     $datasClean = [];
     
     if ($datas) {
+        $attributesValid = ['id', 'icao', 'category', 'squawk', 'flight', 'lat',
+            'lon', 'altitude', 'vert_rate', 'track', 'speed', 'seen_at', 'messages', 'rssi', 'emergency'];
+        
         foreach ($datas as $data) {
-            $datasClean[] = $data;
+
+            $prepare = [];
+
+            foreach ($data as $idx => $attribute) {
+                if (in_array($idx, $attributesValid)) {
+                    $prepare[$idx] = $attribute;
+                }
+            }
+
+            $datasClean[] = $prepare;
         }
     }
-    
+
     return $datasClean;
 }
 
@@ -114,13 +127,15 @@ function uploadToApi($data)
     $token = API_TOKEN;
 
 
-    $parameters = json_encode([
-        'data' => $data
+    $parameters = http_build_query([
+        'data' => json_encode($data)
     ]);
 
+    var_dump($parameters);
+
     $headers = [
-        'Accept: application/json',
-        'Content-Type: application/json',
+        //'Accept: application/json',
+        //'Content-Type: application/json',
         'Authorization: Bearer ' . $token,
         //'Content-length: ' . strlen($parameters),
     ];

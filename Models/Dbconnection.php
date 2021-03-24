@@ -214,8 +214,6 @@ EOL;
 EOL;
 
             if ($query) {
-                echo "Insertando:\n $query";
-
                 $this->execute($query);
             }
         }
@@ -231,15 +229,15 @@ EOL;
     public function getLastsAirflight($limit = 10)
     {
         $query = <<<EOL
-            SELECT * FROM reports
+            SELECT id, icao, category, squawk, flight, lat, lon, altitude, 
+            vert_rate, track, speed, seen_at, messages, rssi, emergency 
+            FROM reports
             ORDER BY seen_at DESC
             LIMIT $limit
             ;
 EOL;
 
         if ($query) {
-            echo "Consultando:\n $query";
-
             return $this->execute($query);
         }
 
