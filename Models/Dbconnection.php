@@ -257,7 +257,7 @@ EOL;
 
         $query = <<<EOL
             DELETE FROM reports
-            WHERE id IN $idsString
+            WHERE id IN ($idsString)
             ;
 EOL;
 

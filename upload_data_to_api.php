@@ -5,6 +5,7 @@ use App\Helpers\Log;
 use App\Models\Dbconnection;
 use Exception;
 use Symfony\Component\Dotenv\Dotenv;
+use function count;
 use function curl_setopt;
 use function define;
 use function http_build_query;
@@ -118,7 +119,11 @@ function deleteDbData($datas)
         $ids[] = $data['id'];
     }
 
-    return $db ? $db->deleteAirflight($data) : null;
+    if (count($ids)) {
+        return $db ? $db->deleteAirflight($ids) : null;
+    }
+
+    return null;
 }
 
 function uploadToApi($data)
@@ -131,7 +136,7 @@ function uploadToApi($data)
         'data' => json_encode($data)
     ]);
 
-    var_dump($parameters);
+    //var_dump($parameters);
 
     $headers = [
         //'Accept: application/json',
@@ -153,7 +158,8 @@ function uploadToApi($data)
 
     echo "\n RESPUESTA API \n";
     //var_dump(curl_getinfo($curl));
-    var_dump($resp); die();
+    var_dump($resp);
+    //var_dump($resp); die();
 
     return $resp;
 }
@@ -170,9 +176,13 @@ function start()
     ## Si existen reportes, intento subirlos a la api.
     $upload = $data ? uploadToApi($data) : false;
 
+    echo "\nUpload: " . $upload . "\n";
+
     ## Si se subieron los reportes correctamente a la api los elimino.
     if ($upload) {
-        //$delete = deleteDbData($data);
+        echo "\nEliminando datos\n";
+
+        $delete = deleteDbData($data);
     }
 
     try {
