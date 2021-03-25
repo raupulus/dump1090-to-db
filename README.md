@@ -15,10 +15,10 @@ Repository [https://gitlab.com/fryntiz/dump1090-to-db.git](https://gitlab.com/fr
 - [x] Autoinstaller DB, create db and table
 - [x] Airflight model
 - [x] Get data from dump1090 json
-- [x] Autoinstaller php dependencies 
+- [x] Autoinstaller php dependencies
 - [x] Vars from .env
 - [x] Save data to postgresql DB
-- [ ] Api upload
+- [x] Api upload
 - [ ] Create Daemon Service
 
 ## Dependencias
@@ -27,7 +27,7 @@ Repository [https://gitlab.com/fryntiz/dump1090-to-db.git](https://gitlab.com/fr
 - postgresql
 - composer >= 2.0.11
 
-## Datos del json
+## Json Updates
 
 - hex → ICAO 24 bits (6 dígitos hexadecimales)
 - squawk → Código de transpondedor seleccionado (Señal squawk en representación octal)
@@ -38,13 +38,13 @@ Repository [https://gitlab.com/fryntiz/dump1090-to-db.git](https://gitlab.com/fr
 - altitude → Altitud en pies, o "ground" si está en tierra
 - vert_rate → Velocidad vertical en pies/minuto
 - track: track verdadero sobre el suelo en grados (0-359)
-- speed: velocidad informada en kt. esto suele ser la velocidad sobre el suelo, pero podría ser ias; no se puede notar la diferencia aquí, ¡lo siento!
+- speed: velocidad informada en kt. esto suele ser la velocidad sobre el suelo
 - messages: número total de mensajes de modo s recibidos desde esta aeronave
 - seen: cuánto tiempo (en segundos antes de "ahora") se recibió un mensaje de este avión por última vez
 - rssi: rssi promedio reciente (potencia de señal), en dbfs; esto siempre será negativo.
 
 
-## Environment Variables 
+## Environment Variables
 
 - DB_CONNECTION → Type of SGBD (default psql)
 - DB_HOST → IP to database HOST
@@ -82,3 +82,21 @@ Manual php script execution:
 ```bash
 php dump1090_exporter.php
 ```
+
+## Automatic start
+
+### Cron job
+
+Edit **/etc/crontab**
+
+```bash
+sudo nano /etc/crontab
+```
+
+Modify path and add the next line:
+
+**@reboot pi sleep 40 && cd /home/pi/git/dump1090_backup && ./start_dump1090_exporter.sh >> /tmp/dump1090.log 2>> /tmp/dump1090.log**
+
+### Daemon
+
+Work in progress!
