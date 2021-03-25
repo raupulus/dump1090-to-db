@@ -161,7 +161,10 @@ function uploadToApi($data)
     var_dump($resp);
     //var_dump($resp); die();
 
-    return $resp;
+
+    //TODO: esto tiene que devolver si o si un boolean
+
+    return $resp == '"Guardado Correctamente"';
 }
 
 function start()
