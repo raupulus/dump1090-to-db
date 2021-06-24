@@ -32,7 +32,7 @@ $dotenv->overload(__DIR__.'/.env');
 
 ## Environment vars
 
-define('DEBUG', isset($_ENV['DEBUG']) ? $_ENV['DEBUG'] : true);
+define('DEBUG', isset($_ENV['DEBUG']) ? $_ENV['DEBUG'] : false);
 define('PATH_TO_AIRCRAFT_JSON', isset($_ENV['PATH_TO_AIRCRAFT_JSON']) ? $_ENV['PATH_TO_AIRCRAFT_JSON'] : '/run/dump1090-fa/aircraft.json');
 
 ## Messages

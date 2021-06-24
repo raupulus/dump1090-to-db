@@ -95,7 +95,7 @@ sudo nano /etc/crontab
 
 Modify path and add the next line:
 
-**@reboot pi sleep 40 && cd /home/pi/git/dump1090_backup && ./start_dump1090_exporter.sh >> /tmp/dump1090.log 2>> /tmp/dump1090.log**
+**@reboot pi sleep 40 && cd /home/pi/git/dump1090-to-db && . /start_dump1090_exporter.sh >> /tmp/dump1090.log 2>> /tmp/dump1090.log**
 
 ### Daemon
 
