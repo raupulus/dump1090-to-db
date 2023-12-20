@@ -103,7 +103,7 @@ function export()
     }
 
     ## Check json data.
-    if ($jsonData && isset($jsonData['aircraft'])) {
+    if ($jsonData && isset($jsonData['aircraft']) && count($jsonData['aircraft']) && isset($jsonData['messages']) && $jsonData['messages'] > 0) {
         if (DEBUG) {
             Log::info(AIRCRAFT_AVAILABLE);
         }
