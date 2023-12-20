@@ -89,15 +89,20 @@ class Airflight
      */
     public $aircraft = [];
 
+    public $debug = false;
+
     /**
      * Airflight constructor.
      *
      * @param array $datas Json decoded data like /run/dump1090-fa/aircraft.json
      * @param null  $startAt Read seconds from unix time.
      */
-    public function __construct(Array $datas = [], $startAt = null)
+    public function __construct(Array $datas = [], $startAt = null, $debug = false)
     {
-        var_dump($datas);
+        if ($debug) {
+            var_dump($datas);
+        }
+
         if ($startAt) {
             try {
                 $startAt = Carbon::createFromTimestamp($startAt, 'UTC');

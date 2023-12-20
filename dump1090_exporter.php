@@ -110,11 +110,7 @@ function export()
 
         $now = isset($jsonData['now']) ? $jsonData['now'] : null;
 
-        if ($now) {
-            $airflight = new Airflight($jsonData, $now);
-        } else {
-            $airflight = new Airflight($jsonData);
-        }
+        $airflight = new Airflight($jsonData, $now, DEBUG);
 
         $aircrafts = $airflight->aircraft;
 

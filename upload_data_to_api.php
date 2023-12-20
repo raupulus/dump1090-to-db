@@ -44,9 +44,9 @@ define('DB_PASSWORD', isset($_ENV['DB_PASSWORD']) ? $_ENV['DB_PASSWORD'] : '');
 define('DB_ERROR_CONNECTION', 'Error al conectar con la base de datos');
 
 ## Api
-
 define('API_URL', isset($_ENV['API_URL']) ? $_ENV['API_URL'] : '');
 define('API_TOKEN', isset($_ENV['API_TOKEN']) ? $_ENV['API_TOKEN'] : '');
+define('DEVICE_ID', isset($_ENV['DEVICE_ID']) ? $_ENV['DEVICE_ID'] : '');
 
 try {
     $dbParams = [
@@ -130,10 +130,12 @@ function uploadToApi($data)
 {
     $url = API_URL;
     $token = API_TOKEN;
+    $deviceId = DEVICE_ID;
 
 
     $parameters = http_build_query([
-        'data' => json_encode($data)
+        'data' => json_encode($data),
+        'hardware_device_id' => $deviceId
     ]);
 
     //var_dump($parameters);
