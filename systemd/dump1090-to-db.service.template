@@ -1,0 +1,20 @@
+[Unit]
+Description=dump1090-to-db exporter (lee aircraft.json, guarda en DB y sube a la API)
+After=network-online.target postgresql.service
+Wants=network-online.target
+StartLimitIntervalSec=60
+StartLimitBurst=5
+
+[Service]
+Type=simple
+User=__SERVICE_USER__
+WorkingDirectory=__WORKING_DIR__
+ExecStart=/bin/bash __WORKING_DIR__/start_dump1090_exporter.sh
+Restart=on-failure
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=dump1090-to-db
+
+[Install]
+WantedBy=multi-user.target

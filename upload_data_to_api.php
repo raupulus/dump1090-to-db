@@ -12,6 +12,10 @@ use function http_build_query;
 use function in_array;
 use function json_encode;
 use function var_dump;
+use function curl_getinfo;
+use function curl_exec;
+use function curl_close;
+use function curl_init;
 use const API_TOKEN;
 use const API_URL;
 use const CURLOPT_HTTPHEADER;
@@ -153,8 +157,10 @@ function uploadToApi($data)
     curl_setopt($curl, CURLOPT_POST, true);
     curl_setopt($curl, CURLOPT_POSTFIELDS, $parameters);
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($curl, CURLOPT_TIMEOUT, 15);
 
     $resp = curl_exec($curl);
+    $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 
     curl_close($curl);
 
@@ -166,7 +172,7 @@ function uploadToApi($data)
 
     //TODO: esto tiene que devolver si o si un boolean
 
-    return $resp == '"Guardado Correctamente"';
+    return in_array($httpCode, [200, 201]);
 }
 
 function start()
@@ -190,24 +196,7 @@ function start()
         $delete = deleteDbData($data);
     }
 
-    try {
-        if ($data) {
 
-        }
-
-        /*
-        if ($delete && DEBUG) {
-            Log::info('Eliminado correctamente');
-        } else if (DEBUG) {
-            Log::info('No se ha podido eliminar');
-        }
-        */
-    } catch (Exception $e) {
-        if (DEBUG) {
-            Log::error('Error al intentar eliminar elementos de la DB');
-            Log::error($e);
-        }
-    }
 
 
     if (DEBUG) {

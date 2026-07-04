@@ -4,6 +4,8 @@ namespace App\Models;
 use PDO;
 use function implode;
 use function var_dump;
+use function array_fill;
+use function count;
 
 /**
  * Clase que representa la conexión con la db y devuelve las colecciones de
@@ -42,7 +44,7 @@ class Dbconnection
         do {
             $try++;
             $this->dbh = $this->connect();
-            usleep(300);  ## Pausa en milisegundos.
+            sleep(1);  ## Pausa de un segundo.
         } while (($this->dbh === null) && ($try <= 10));
     }
 
@@ -65,7 +67,9 @@ class Dbconnection
                 $params['DB_PASSWORD'],
                 $params['OPTIONS']
             );
-        } catch (\Exception $e) {}
+        } catch (\Exception $e) {
+            \App\Helpers\Log::error($e->getMessage());
+        }
 
         return null;
     }
@@ -77,12 +81,12 @@ class Dbconnection
      *
      * @return null
      */
-    public function execute($query)
+    public function execute($query, $params = [])
     {
         if ($query) {
             try {
                 $q = $this->dbh->prepare($query);
-                $q->execute();
+                $q->execute($params);
 
                 if ($q) {
                     return $q;
@@ -114,7 +118,9 @@ EOL;
                 if ($q) {
                     return (int)$q->fetchColumn();
                 }
-            } catch (\Exception $e) {}
+            } catch (\Exception $e) {
+                \App\Helpers\Log::error($e->getMessage());
+            }
         }
 
         return 0;
@@ -139,7 +145,9 @@ EOL;
             //$this->dbh->closeCursor();
             $this->dbh = null;
             return true;
-        } catch (\Exception $e) {}
+        } catch (\Exception $e) {
+            \App\Helpers\Log::error($e->getMessage());
+        }
 
         return null;
     }
@@ -180,41 +188,32 @@ EOL;
     public function saveAirflight($airflights)
     {
         foreach ($airflights as $airflight) {
-
-            $lon = $airflight->lon ?? 'null';
-            $lat = $airflight->lat ?? 'null';
-            $altitude = $airflight->altitude ?? 'null';
-            $vert_rate = $airflight->vert_rate ?? 'null';
-            $track = $airflight->track ?? 'null';
-            $rssi = $airflight->rssi ?? 'null';
-            $speed = $airflight->speed ?? 'null';
-            $messages = $airflight->messages ?? 'null';
-
             $query = <<<EOL
             INSERT INTO reports (icao, category, squawk, flight, lon, lat,
                                  altitude, vert_rate, track, speed, messages,
                                  seen_at, rssi, emergency)
-            VALUES 
-            (
-                '$airflight->icao', 
-                '$airflight->category',
-                '$airflight->squawk',
-                '$airflight->flight',
-                $lon,
-                $lat,
-                $altitude,
-                $vert_rate,
-                $track,
-                $speed,
-                $messages,
-                '$airflight->seen_at',
-                $rssi,
-                '$airflight->emergency'
-            );
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 EOL;
 
+            $params = [
+                $airflight->icao,
+                $airflight->category,
+                $airflight->squawk,
+                $airflight->flight,
+                $airflight->lon ?? null,
+                $airflight->lat ?? null,
+                $airflight->altitude ?? null,
+                $airflight->vert_rate ?? null,
+                $airflight->track ?? null,
+                $airflight->speed ?? null,
+                $airflight->messages ?? null,
+                $airflight->seen_at,
+                $airflight->rssi ?? null,
+                $airflight->emergency
+            ];
+
             if ($query) {
-                $this->execute($query);
+                $this->execute($query, $params);
             }
         }
     }
@@ -253,32 +252,22 @@ EOL;
      */
     public function deleteAirflight(array $ids)
     {
-        $idsString = implode(',', $ids);
+        $placeholders = implode(',', array_fill(0, count($ids), '?'));
 
         $query = <<<EOL
             DELETE FROM reports
-            WHERE id IN ($idsString)
+            WHERE id IN ($placeholders)
             ;
 EOL;
 
         if ($query) {
             echo "Eliminando: $query";
 
-            return $this->execute($query);
+            return $this->execute($query, $ids);
         }
 
         return null;
     }
 
-    /**
-     * Delete element by ID
-     *
-     * @param $id
-     */
-    public function delete($id)
-    {
-
-    }
 }
-
 ?>
