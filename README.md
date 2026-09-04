@@ -4,7 +4,7 @@ Lightweight PHP toolkit that reads the aircraft JSON feed produced by `dump1090-
 
 Designed to run on low-power devices (e.g. Raspberry Pi) alongside an ADS-B receiver.
 
-Repository: [https://gitlab.com/fryntiz/dump1090-to-db.git](https://gitlab.com/fryntiz/dump1090-to-db.git)
+Repository: [https://gitlab.com/raupulus/dump1090-to-db.git](https://gitlab.com/raupulus/dump1090-to-db.git)
 
 ## Table of contents
 
@@ -160,8 +160,8 @@ Extended technical documentation, architecture notes and the decision log are ke
 ## Author
 
 - Name: Raúl Caro Pastorino
-- Web: [fryntiz.es](https://fryntiz.es)
-- Twitter: [@fryntiz](https://twitter.com/fryntiz)
+- Web: [fryntiz.es](https://raupulus.dev)
+- Twitter: [@fryntiz](https://twitter.com/raupulus)
 
 ## License
 
