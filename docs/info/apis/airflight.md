@@ -15,7 +15,7 @@ Para consultar la especificación oficial destilada y validada de la API, ver [`
   - `flight`: Callsign limpio sin espacios laterales.
   - `squawk`: Cadena de 4 dígitos o null.
   - `lat`, `lon`: Flotantes WGS84 dentro de rangos válidos.
-  - `altitude`, `speed`, `track`, `messages`: Valores numéricos saneados.
+  - `altitude`, `speed`, `track`, `vert_rate`, `rssi`, `messages`: Valores numéricos saneados.
 - Adjunta el bloque de telemetría de salud `hardware_device_info` generado por `App\Helpers\HardwareInfo`.
 - Envía la petición HTTP POST codificada en JSON nativo mediante cURL, siguiendo redirecciones (`CURLOPT_FOLLOWLOCATION`) y preservando el método (`CURLOPT_POSTREDIR = CURL_REDIR_POST_ALL`).
 - Valida la respuesta contra el envelope estándar (`status: 201` y `success: true`).

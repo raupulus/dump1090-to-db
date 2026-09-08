@@ -87,5 +87,15 @@ Registro cronológico (más reciente al final) de decisiones de diseño, arquite
 4. **Preservación de Valores Cero en `src/Models/Airflight.php`:** Se corrigieron las condiciones de comprobación a `$value !== null && $value !== ''`, evitando que valores válidos como `speed = 0`, `track = 0` (rumbo norte) o `vert_rate = 0` fuesen evaluados erróneamente como vacíos.
 
 ---
+
+## 2026-09-08 — Mapeo de Telemetría Extendida (RSSI y Vert Rate) en Subida a API
+
+**Decisión:** Se incorpora el mapeo explícito de `rssi` (potencia de señal en dBFS) y `vert_rate` (tasa de ascenso/descenso vertical) desde la base de datos local `reports` hacia el payload de `src/upload_data_to_api.php` en el endpoint `POST /api/v2/airflight/aircrafts/batch`.
+
+1. **Causa Raíz:** Ambos campos eran capturados correctamente desde `aircraft.json` e insertados en la tabla local `reports` por `dump1090_exporter.php`, pero la función `getDbData()` en `upload_data_to_api.php` no los incluía en el mapeo asociativo `$item`, provocando que el backend recibiera `null` constante en la tabla de rutas.
+2. **Saneamiento:** Se aplican conversiones estrictas con redondeo a 1 decimal para `vert_rate` y `rssi`, garantizando compatibilidad con los tipos numéricos esperados en el backend.
+
+---
 > Creado: 2026-07-03 · Última revisión: 2026-09-08
+
 
