@@ -13,7 +13,7 @@ Para consultar la especificación oficial destilada y validada de la API, ver [`
 - Normaliza y sanea las propiedades de cada aeronave para cumplir estrictamente la validación del endpoint `POST /api/v2/airflight/aircrafts/batch`:
   - `icao`: Cadena hex en minúsculas de 6 caracteres.
   - `flight`: Callsign limpio sin espacios laterales.
-  - `squawk`: Cadena de 4 dígitos o null.
+  - `squawk`, `emergency`: Cadenas de texto alfanumérico o null.
   - `lat`, `lon`: Flotantes WGS84 dentro de rangos válidos.
   - `altitude`, `speed`, `track`, `vert_rate`, `rssi`, `messages`: Valores numéricos saneados.
 - Adjunta el bloque de telemetría de salud `hardware_device_info` generado por `App\Helpers\HardwareInfo`.

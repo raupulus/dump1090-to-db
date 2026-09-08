@@ -151,6 +151,7 @@ function getDbData(int $limit = 100): array
             $messages = (isset($row['messages']) && is_numeric($row['messages'])) ? max(0, (int) $row['messages']) : null;
             $vertRate = (isset($row['vert_rate']) && is_numeric($row['vert_rate'])) ? round((float) $row['vert_rate'], 1) : null;
             $rssi = (isset($row['rssi']) && is_numeric($row['rssi'])) ? round((float) $row['rssi'], 1) : null;
+            $emergency = isset($row['emergency']) ? trim((string) $row['emergency']) : null;
 
             $item = [
                 'icao' => $icao,
@@ -166,6 +167,7 @@ function getDbData(int $limit = 100): array
                 'seen_pos' => null,
                 'messages' => $messages,
                 'rssi' => $rssi,
+                'emergency' => ($emergency !== '') ? $emergency : null,
             ];
 
             $items[] = $item;
