@@ -294,12 +294,16 @@ function start()
         return;
     }
 
-    echo "Procesando lote de $count reportes...\n";
+    if (DEBUG) {
+        echo "Procesando lote de $count reportes...\n";
+    }
 
     ## Intento subir el lote a la API
     $uploaded = uploadToApi($items);
 
-    echo "Resultado de subida API: " . ($uploaded ? "ÉXITO" : "FALLO") . "\n";
+    if (DEBUG || !$uploaded) {
+        echo "Resultado de subida API: " . ($uploaded ? "ÉXITO" : "FALLO") . "\n";
+    }
 
     ## Si se subieron correctamente, los elimino del buffer local en RAM
     if ($uploaded && !empty($ids)) {

@@ -25,7 +25,9 @@ do
 
     ## Sube a la API según la configuración de iteraciones
     if [[ $count -ge $T_INTERVAL_UPLOAD_API ]]; then
-        echo "Subiendo a la api"
+        if [[ "${DEBUG}" == "true" ]]; then
+            echo "Subiendo a la api"
+        fi
 
         count=0
 

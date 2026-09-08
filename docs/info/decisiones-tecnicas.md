@@ -63,4 +63,14 @@ Registro cronológico (más reciente al final) de decisiones de diseño, arquite
    - Se añaden `/docs/planning/` y `/docs/auditorias/` a `.gitignore` como carpetas de trabajo efímero por desarrollador.
 
 ---
+
+## 2026-09-08 — Supresión de Logs Innecesarios y Protección de Tarjeta MicroSD
+
+**Decisión:** Se elimina el registro verboso redundante en producción para evitar escrituras y desgaste innecesario de la memoria flash de la tarjeta MicroSD en la Raspberry Pi.
+
+1. **Corrección de Evaluación Booleana en `src/dump1090_exporter.php`:** La constante `DEBUG` se evaluaba con `isset($_ENV['DEBUG']) ? $_ENV['DEBUG'] : false`. Dado que las variables cargadas desde `.env` son cadenas de texto, el valor `"false"` se interpretaba en PHP como booleano `true`, emitiendo dos líneas de log (`El archivo JSON existe`, `Hay registro de vuelos`) cada 10 segundos (~17.280 escrituras diarias). Se corrigió con `filter_var($_ENV['DEBUG'], FILTER_VALIDATE_BOOLEAN)`.
+2. **Silenciado en Modo Normal (`DEBUG=false`):** Se condicionaron los mensajes de progreso rutinario (`Subiendo a la api`, `Procesando lote...`) en `scripts/start_dump1090_exporter.sh` y `src/upload_data_to_api.php`.
+3. **Visibilidad de Incidentes:** En caso de fallo en la subida a la API (`!$uploaded`) o errores de base de datos, el servicio continúa registrando el error de forma inmediata en journald para garantizar su monitorización sin saturar el sistema.
+
+---
 > Creado: 2026-07-03 · Última revisión: 2026-09-08

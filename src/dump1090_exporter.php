@@ -8,6 +8,8 @@ use Exception;
 use function count;
 use function define;
 use function file_exists;
+use function filter_var;
+use const FILTER_VALIDATE_BOOLEAN;
 use Symfony\Component\Dotenv\Dotenv;
 
 require_once __DIR__ . '/../vendor/autoload.php';
@@ -32,7 +34,7 @@ $dotenv->overload(__DIR__ . '/../.env');
 
 ## Environment vars
 
-define('DEBUG', isset($_ENV['DEBUG']) ? $_ENV['DEBUG'] : false);
+define('DEBUG', isset($_ENV['DEBUG']) ? filter_var($_ENV['DEBUG'], FILTER_VALIDATE_BOOLEAN) : false);
 define('PATH_TO_AIRCRAFT_JSON', isset($_ENV['PATH_TO_AIRCRAFT_JSON']) ? $_ENV['PATH_TO_AIRCRAFT_JSON'] : '/run/dump1090-fa/aircraft.json');
 
 ## Messages
