@@ -21,31 +21,44 @@ Capa de acceso a datos y abstracción PDO sobre la base de datos PostgreSQL loca
 ---
 
 ## 2. Modelo de datos
-- **Tabla afectada**: `reports`
+- **Tabla afectada**: `reports` (Buffer temporal para la API)
   - `id`: `BIGSERIAL PRIMARY KEY`
   - `icao`, `category`, `squawk`, `flight`, `emergency`: `VARCHAR(100)`
   - `lat`, `lon`, `altitude`, `vert_rate`, `track`, `speed`, `rssi`: `FLOAT` (`double precision`)
   - `seen_at`: `TIMESTAMP`
   - `messages`: `INTEGER`
+- **Tabla afectada**: `aircraft_state` (Control de estado y desduplicación de aviones congelados)
+  - `icao`: `VARCHAR(100) PRIMARY KEY`
+  - `messages`: `INTEGER NOT NULL`
+  - `updated_at`: `TIMESTAMP DEFAULT CURRENT_TIMESTAMP`
 
 ---
 
 ## 3. Flujos principales
-1. **Inserción de Vuelos (`saveAirflight`)**:
-   - Itera sobre el array de objetos `Aircraft` y ejecuta `INSERT INTO reports (...) VALUES (...)`.
-2. **Extracción para Lotes (`getLastsAirflight`)**:
+1. **Inicialización Preventiva (`ensureTablesExist`)**:
+   - Garantiza que `reports` y `aircraft_state` existan tras arrancar PostgreSQL en RAM (tmpfs).
+2. **Detección de Variaciones y Desduplicación (`getAircraftStates` / `upsertAircraftStates`)**:
+   - `getAircraftStates()` devuelve el mapa `[icao => messages]` previo para omitir aeronaves congeladas.
+   - `upsertAircraftStates()` actualiza en bloque el contador de mensajes usando `ON CONFLICT (icao) DO UPDATE`.
+3. **Inserción de Vuelos (`saveAirflight`)**:
+   - Itera sobre el array de objetos `Aircraft` con variaciones y ejecuta `INSERT INTO reports (...) VALUES (...)`.
+4. **Extracción para Lotes (`getLastsAirflight`)**:
    - Ejecuta `SELECT ... FROM reports ORDER BY seen_at DESC LIMIT $limit` (máximo 500).
-3. **Borrado Transaccional (`deleteAirflight`)**:
+5. **Borrado Transaccional (`deleteAirflight`)**:
    - Recibe un array de IDs y ejecuta `DELETE FROM reports WHERE id IN (?, ?, ...)` usando prepared statements.
-4. **Purga Preventiva (`purgeOldAirflights`)**:
-   - Ejecuta `DELETE FROM reports WHERE seen_at < NOW() - INTERVAL '$hours hours'`.
+6. **Purga Preventiva (`purgeOldAirflights` / `purgeOldAircraftStates`)**:
+   - Purga reportes antiguos de `reports` (umbral configurable, por defecto 2h) y estados inactivos de `aircraft_state` (1h).
 
 ---
 
 ## 4. Puntos de entrada
 - **Constructor:**
-  - `__construct(array $params = [])`: Inicializa parámetros y conecta a PDO con hasta 10 reintentos espaciados por 1 segundo.
+  - `__construct(array $params = [])`: Inicializa parámetros, conecta a PDO con hasta 10 reintentos y asegura la presencia de las tablas (`ensureTablesExist`).
 - **Métodos públicos:**
+  - `ensureTablesExist(): void`
+  - `getAircraftStates(): array<string, int>`
+  - `upsertAircraftStates(array $states): void`
+  - `purgeOldAircraftStates(int $hours = 1): mixed`
   - `saveAirflight(array $airflights): void`
   - `getLastsAirflight(int $limit = 100): \PDOStatement|null`
   - `deleteAirflight(array $ids): bool`

@@ -64,6 +64,7 @@ No requiere configuración directa propia; toma el parámetro `$debug` de la con
 
 ## 7. Trampas conocidas
 - **Unidades métricas vs aeronáuticas:** Los datos se normalizan a metros y m/s. Si un consumidor espera pies o nudos, debe realizar la conversión inversa o consultar directamente el JSON en crudo.
+- **Preservación de ceros numéricos:** Valores numéricos equivalentes a cero (`speed = 0`, `track = 0` indicando rumbo norte o `altitude = 0` a nivel de suelo) deben verificarse con `$val !== null && $val !== ''` para evitar que un condicional simple los anule.
 - **Campos nulos:** Muchos atributos son opcionales en tramas ADS-B (p. ej. `lat`, `lon` o `squawk` pueden ser `null` si el transpondedor no los ha transmitido aún).
 
 ---

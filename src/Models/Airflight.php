@@ -126,7 +126,7 @@ class Airflight
                 if (array_key_exists($key, $this->attributes)) {
                     $value = $attribute ?? null;
 
-                    if ($value) {
+                    if ($value !== null && $value !== '') {
                         ## Aplico saneados a cada atributo si lo tuviera.
                         foreach ($this->attributes[$key] as $validation) {
                             $value = $this->{$validation}($value);
@@ -161,7 +161,7 @@ class Airflight
      */
     private function feetToMeters($feets)
     {
-        if (!$feets) {
+        if ($feets === null || $feets === '') {
             return null;
         }
 
@@ -216,7 +216,7 @@ class Airflight
      */
     private function knotsToMeters($kt)
     {
-        if (! $kt || ! is_numeric($kt)) {
+        if ($kt === null || $kt === '' || !is_numeric($kt)) {
             return null;
         }
 

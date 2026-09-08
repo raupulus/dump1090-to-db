@@ -73,4 +73,19 @@ Registro cronológico (más reciente al final) de decisiones de diseño, arquite
 3. **Visibilidad de Incidentes:** En caso de fallo en la subida a la API (`!$uploaded`) o errores de base de datos, el servicio continúa registrando el error de forma inmediata en journald para garantizar su monitorización sin saturar el sistema.
 
 ---
+
+## 2026-09-08 — Desduplicación de Aeronaves Congeladas y Subida por Variación de Mensajes
+
+**Decisión:** Se introduce un mecanismo de control de estado local para omitir aeronaves congeladas o estancadas en `aircraft.json`, persistiendo y subiendo a la API únicamente registros donde exista una variación real en el contador de `messages`.
+
+1. **Causa Raíz:** `dump1090-fa` conserva en `aircraft.json` las aeronaves durante aproximadamente 60 segundos tras el último paquete recibido antes de descartarlas por inactividad. Al ejecutarse el extractor cada 10 segundos y la subida cada 3 ciclos (~30s), se generaban múltiples filas idénticas con el mismo número de mensajes y sin nuevas tramas de posición, saturando la base de datos de producción con datos redundantes.
+2. **Tabla `aircraft_state` en PostgreSQL:** Se almacena el último contador de `messages` por `icao` (`icao VARCHAR PRIMARY KEY, messages INTEGER NOT NULL, updated_at TIMESTAMP`). Al operar la BD en RAM (`/ramdisk`), esta verificación no genera desgaste en la MicroSD.
+3. **Lógica de Filtrado:**
+   - Si un avión ya existe en `aircraft_state` y `$currentMessages === $lastMessages`: se considera congelado y se descarta de la inserción en `reports`.
+   - Si no existe (nueva detección) o `$currentMessages !== $lastMessages`: se admite, se inserta en el buffer `reports` y se actualiza `aircraft_state` con upsert (`ON CONFLICT (icao) DO UPDATE`).
+   - Se incluye purga periódica automática de estados antiguos inactivos (>1 hora).
+4. **Preservación de Valores Cero en `src/Models/Airflight.php`:** Se corrigieron las condiciones de comprobación a `$value !== null && $value !== ''`, evitando que valores válidos como `speed = 0`, `track = 0` (rumbo norte) o `vert_rate = 0` fuesen evaluados erróneamente como vacíos.
+
+---
 > Creado: 2026-07-03 · Última revisión: 2026-09-08
+

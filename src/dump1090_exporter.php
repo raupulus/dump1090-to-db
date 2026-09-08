@@ -9,6 +9,8 @@ use function count;
 use function define;
 use function file_exists;
 use function filter_var;
+use function is_numeric;
+use function trim;
 use const FILTER_VALIDATE_BOOLEAN;
 use Symfony\Component\Dotenv\Dotenv;
 
@@ -134,8 +136,43 @@ function export()
                 return false;
             }
 
-            $db->saveAirflight($airflight->aircraft);
+            // Obtener mapa de estados previos de aeronaves para detectar variaciones
+            $knownStates = $db->getAircraftStates();
+            $toSave = [];
+            $statesToUpdate = [];
+
+            foreach ($aircrafts as $aircraft) {
+                $icao = trim((string) ($aircraft->icao ?? ''));
+                if ($icao === '') {
+                    continue;
+                }
+
+                $currentMessages = isset($aircraft->messages) && is_numeric($aircraft->messages)
+                    ? (int) $aircraft->messages
+                    : 0;
+
+                // Si ya conocemos la aeronave y sus mensajes son idénticos, está congelada: omitir
+                if (isset($knownStates[$icao]) && $knownStates[$icao] === $currentMessages) {
+                    continue;
+                }
+
+                // Hay variación en mensajes (o es una nueva aeronave detectada)
+                $toSave[] = $aircraft;
+                $statesToUpdate[$icao] = $currentMessages;
+            }
+
+            if (!empty($toSave)) {
+                $db->saveAirflight($toSave);
+                $db->upsertAircraftStates($statesToUpdate);
+                if (DEBUG) {
+                    Log::info("Guardados " . count($toSave) . " vuelos con actividad/variación.");
+                }
+            } else if (DEBUG) {
+                Log::info("Todos los vuelos detectados están congelados (sin variación de mensajes). Omitidos.");
+            }
+
             $db->purgeOldAirflights(2);
+            $db->purgeOldAircraftStates(1);
         }
     } else {
         if (DEBUG) {

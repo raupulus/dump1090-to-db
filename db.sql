@@ -19,3 +19,10 @@ CREATE TABLE reports
     rssi     FLOAT NULL,
     emergency VARCHAR(100) NULL
 );
+
+CREATE TABLE IF NOT EXISTS aircraft_state
+(
+    icao         VARCHAR(100) PRIMARY KEY,
+    messages     INTEGER NOT NULL,
+    updated_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

@@ -44,8 +44,15 @@ class Dbconnection
         do {
             $try++;
             $this->dbh = $this->connect();
+            if ($this->dbh !== null) {
+                break;
+            }
             sleep(1);  ## Pausa de un segundo.
-        } while (($this->dbh === null) && ($try <= 10));
+        } while ($try <= 10);
+
+        if ($this->dbh !== null) {
+            $this->ensureTablesExist();
+        }
     }
 
     /**
@@ -294,6 +301,104 @@ EOL;
         return null;
     }
 
+    /**
+     * Asegura que existan las tablas necesarias en la base de datos (por si arranca tras un reinicio en RAM).
+     *
+     * @return void
+     */
+    public function ensureTablesExist(): void
+    {
+        $query = <<<EOL
+            CREATE TABLE IF NOT EXISTS reports (
+                id BIGSERIAL PRIMARY KEY,
+                icao VARCHAR(100) NULL,
+                category VARCHAR(100) NULL,
+                squawk VARCHAR(100) NULL,
+                flight VARCHAR(100) NULL,
+                lat FLOAT NULL,
+                lon FLOAT NULL,
+                altitude FLOAT NULL,
+                vert_rate FLOAT NULL,
+                track FLOAT NULL,
+                speed FLOAT NULL,
+                seen_at TIMESTAMP NULL,
+                messages INTEGER NULL,
+                rssi FLOAT NULL,
+                emergency VARCHAR(100) NULL
+            );
+
+            CREATE TABLE IF NOT EXISTS aircraft_state (
+                icao VARCHAR(100) PRIMARY KEY,
+                messages INTEGER NOT NULL,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+EOL;
+        $this->execute($query);
+    }
+
+    /**
+     * Obtiene el mapa de los últimos estados registrados de aeronaves [icao => messages].
+     *
+     * @return array<string, int>
+     */
+    public function getAircraftStates(): array
+    {
+        $query = "SELECT icao, messages FROM aircraft_state;";
+        $stmt = $this->execute($query);
+
+        if (!$stmt) {
+            return [];
+        }
+
+        $states = [];
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $states[$row['icao']] = (int) $row['messages'];
+        }
+
+        return $states;
+    }
+
+    /**
+     * Inserta o actualiza el último contador de mensajes por aeronave.
+     *
+     * @param array<string, int> $states Mapa [icao => messages]
+     * @return void
+     */
+    public function upsertAircraftStates(array $states): void
+    {
+        if (empty($states)) {
+            return;
+        }
+
+        $query = <<<EOL
+            INSERT INTO aircraft_state (icao, messages, updated_at)
+            VALUES (?, ?, NOW() AT TIME ZONE 'UTC')
+            ON CONFLICT (icao) DO UPDATE
+            SET messages = EXCLUDED.messages,
+                updated_at = EXCLUDED.updated_at;
+EOL;
+
+        try {
+            $stmt = $this->dbh->prepare($query);
+            foreach ($states as $icao => $messages) {
+                $stmt->execute([(string) $icao, (int) $messages]);
+            }
+        } catch (\Exception $e) {
+            \App\Helpers\Log::error("Error actualizando aircraft_state: " . $e->getMessage());
+        }
+    }
+
+    /**
+     * Purga estados de aeronaves que no han tenido actividad durante las últimas horas.
+     *
+     * @param int $hours
+     * @return \PDOStatement|null
+     */
+    public function purgeOldAircraftStates(int $hours = 1)
+    {
+        $query = "DELETE FROM aircraft_state WHERE updated_at < (NOW() AT TIME ZONE 'UTC') - (? || ' hours')::INTERVAL;";
+        return $this->execute($query, [$hours]);
+    }
 }
-?>
+
 
