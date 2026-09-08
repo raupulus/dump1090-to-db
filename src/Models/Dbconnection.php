@@ -308,7 +308,7 @@ EOL;
      */
     public function ensureTablesExist(): void
     {
-        $query = <<<EOL
+        $queryReports = <<<EOL
             CREATE TABLE IF NOT EXISTS reports (
                 id BIGSERIAL PRIMARY KEY,
                 icao VARCHAR(100) NULL,
@@ -326,14 +326,18 @@ EOL;
                 rssi FLOAT NULL,
                 emergency VARCHAR(100) NULL
             );
+EOL;
 
+        $queryState = <<<EOL
             CREATE TABLE IF NOT EXISTS aircraft_state (
                 icao VARCHAR(100) PRIMARY KEY,
                 messages INTEGER NOT NULL,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
 EOL;
-        $this->execute($query);
+
+        $this->execute($queryReports);
+        $this->execute($queryState);
     }
 
     /**
