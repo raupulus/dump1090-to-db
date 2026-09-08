@@ -51,8 +51,11 @@ Authorization: Bearer <token>
 | `data.*.altitude` | numeric | No | Altitud barométrica o geométrica en metros. |
 | `data.*.speed` | numeric | No | Velocidad horizontal en metros por segundo. |
 | `data.*.track` | numeric | No | Rumbo en grados (0 a 360). Admite flotantes. |
-| `data.*.seen` | numeric | No | Segundos desde el último mensaje recibido. |
-| `data.*.seen_pos` | numeric | No | Segundos desde la última posición recibida. |
+| `data.*.vert_rate` | numeric | No | Tasa vertical de ascenso/descenso en m/s. |
+| `data.*.rssi` | numeric | No | Potencia de señal en dBFS (-100 a 0). |
+| `data.*.emergency` | string | No | Estado de emergencia declarado o null. |
+| `data.*.seen` | numeric | No | Segundos desde el último mensaje recibido (null). |
+| `data.*.seen_pos` | numeric | No | Segundos desde la última posición recibida (null). |
 | `data.*.messages` | integer | No | Total de mensajes recibidos de esta aeronave. |
 | `hardware_device_info` | object | No | Objeto de telemetría del dispositivo. |
 | `hardware_device_info.hardware_device_id` | integer | **Sí** (si se envía el bloque) | ID del dispositivo receptor. |

@@ -46,10 +46,13 @@ Especificación funcional y técnica del endpoint para la sincronización masiva
       "lon": -6.141596,
       "altitude": 10275.0,
       "speed": 235.0,
-      "track": 45.5,
-      "seen": 3.8,
-      "seen_pos": 3.8,
-      "messages": 219
+      "track": 45,
+      "vert_rate": 0.0,
+      "messages": 219,
+      "rssi": -24.7,
+      "emergency": null,
+      "seen": null,
+      "seen_pos": null
     }
   ]
 }
