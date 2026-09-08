@@ -100,7 +100,7 @@ class Airflight
     public function __construct(Array $datas = [], $startAt = null, $debug = false)
     {
         if ($debug) {
-            var_dump($datas);
+            // var_dump($datas);
         }
 
         if ($startAt) {

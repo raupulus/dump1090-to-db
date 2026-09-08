@@ -133,6 +133,7 @@ function export()
             }
 
             $db->saveAirflight($airflight->aircraft);
+            $db->purgeOldAirflights(2);
         }
     } else {
         if (DEBUG) {

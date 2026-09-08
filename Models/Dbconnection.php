@@ -221,12 +221,14 @@ EOL;
     /**
      * Obtiene los últimos vuelos limitados a la cantidad recibida.
      *
-     * @param int $limit Cantidad de vuelos a recibir.
+     * @param int $limit Cantidad de vuelos a recibir (máximo 500 para API V2).
      *
-     * @return null
+     * @return \PDOStatement|null
      */
-    public function getLastsAirflight($limit = 10)
+    public function getLastsAirflight($limit = 100)
     {
+        $limit = min(500, max(1, (int)$limit));
+
         $query = <<<EOL
             SELECT id, icao, category, squawk, flight, lat, lon, altitude, 
             vert_rate, track, speed, seen_at, messages, rssi, emergency 
@@ -241,6 +243,31 @@ EOL;
         }
 
         return null;
+    }
+
+    /**
+     * Obtiene el número total de reportes pendientes en la base de datos local.
+     *
+     * @return int
+     */
+    public function countPendingReports(): int
+    {
+        $query = "SELECT count(*) FROM reports;";
+        $q = $this->execute($query);
+
+        return $q ? (int) $q->fetchColumn() : 0;
+    }
+
+    /**
+     * Purga preventiva de registros antiguos en caso de caída prolongada de la API.
+     *
+     * @param int $hours Antigüedad máxima en horas a conservar en el buffer de RAM.
+     * @return \PDOStatement|null
+     */
+    public function purgeOldAirflights(int $hours = 2)
+    {
+        $query = "DELETE FROM reports WHERE seen_at < (NOW() AT TIME ZONE 'UTC') - (? || ' hours')::INTERVAL;";
+        return $this->execute($query, [$hours]);
     }
 
     /**
@@ -261,8 +288,6 @@ EOL;
 EOL;
 
         if ($query) {
-            echo "Eliminando: $query";
-
             return $this->execute($query, $ids);
         }
 
@@ -271,3 +296,4 @@ EOL;
 
 }
 ?>
+

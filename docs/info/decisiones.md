@@ -42,3 +42,18 @@ Registro cronológico (más reciente al final) de decisiones de diseño y deuda 
 - El usuario del servicio se toma de `$SUDO_USER` (quien invocó `sudo`), con `pi` como valor por defecto si no se puede detectar.
 
 **Pendiente/a vigilar:** el servicio usa `Type=simple` sobre un bucle bash sin manejo explícito de `SIGTERM`; ver nota en [AGENTS.md](../../AGENTS.md#puntos-de-atención-conocidos). El `StartLimitBurst=5` / `StartLimitIntervalSec=60` de la unit evita reinicios en bucle infinito si el fallo es persistente (por ejemplo, credenciales de BD inválidas); en ese caso systemd marcará el servicio como fallido tras 5 reinicios en 60s y habrá que revisar `journalctl -u dump1090-to-db` antes de reintentar.
+
+---
+
+## 2026-09-08 — Migración a API V2 (Lotes y Telemetría de Hardware)
+
+**Decisión:** se actualiza el pipeline de subida a la API para alinearlo con el contrato **API V2 — AirFlight**.
+
+1. **Endpoint por Lotes:** se migra de la antigua ruta v1 a `POST /api/v2/airflight/aircrafts/batch` enviando el cuerpo en formato JSON nativo (`Content-Type: application/json`) con autenticación Bearer Sanctum.
+2. **Estructura del Payload:**
+   - `hardware_device_id`: entero o null.
+   - `data`: array de aeronaves saneadas (hasta 500 por lote, configurable con `BATCH_SIZE`), asegurando tipos estrictos para `icao`, `flight`, `squawk`, `lat`, `lon`, `altitude`, `speed`, `track`, `messages`.
+   - `hardware_device_info`: nuevo bloque de estado de salud del hardware del receptor con `temp`, `voltage`, `cpu`, `disk`, `ram`, `uptime`, `ip_local` y métricas extendidas en `extra` (`throttled`, `undervoltage`, `load_1m`, `load_5m`, `load_15m`, `ram_free_mb`, `disk_free_gb`, `buffer_reports`).
+3. **Nuevo Helper `Helpers/HardwareInfo.php`:** clase dedicada a la recolección de métricas del sistema operativo directamente desde `/proc` y `/sys` para minimizar el coste de CPU y latencia (lecturas directas en memoria sin lanzar subprocesos pesados).
+4. **Respuesta Envelope ApiResponseTrait:** se evalúa tanto el código HTTP 201 como el flag `success === true` en la respuesta JSON para confirmar el borrado de los registros procesados en la base de datos local.
+
