@@ -89,7 +89,23 @@ class Aircraft
 
     private function setVertRate($data)
     {
-        $this->vert_rate = isset($data['vert_rate']) ? $data['vert_rate'] : null;
+        $values = [
+            isset($data['vert_rate']) ? $data['vert_rate'] : null,
+            isset($data['baro_rate']) ? $data['baro_rate'] : null,
+            isset($data['geom_rate']) ? $data['geom_rate'] : null,
+        ];
+
+        $values = array_filter($values, static function ($val) {
+            return $val !== null && $val !== '';
+        });
+
+        if (count($values)) {
+            $vertRate = array_shift($values);
+        } else {
+            $vertRate = null;
+        }
+
+        $this->vert_rate = $vertRate;
     }
 
     private function setTrack($data)

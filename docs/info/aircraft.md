@@ -63,6 +63,7 @@ No posee variables de configuración.
 
 ## 7. Trampas conocidas
 - Las propiedades son públicas y dinámicas: no forzar tipos estrictos en el constructor para evitar roturas ante campos adicionales de nuevas versiones de `dump1090`.
+- **Tasa vertical (`vert_rate`):** `dump1090-fa` no emite la clave `vert_rate` en `aircraft.json`, sino `baro_rate` (barométrica) y `geom_rate` (geométrica GPS). El modelo aplica fallback entre `vert_rate`, `baro_rate` y `geom_rate` preservando valores `0` (vuelo nivelado).
 
 ---
 

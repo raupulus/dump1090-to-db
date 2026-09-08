@@ -52,8 +52,8 @@ class Airflight
         'rc' => [],
         'alt_baro' => ['feetToMeters'],
         'alt_geom' => ['feetToMeters'],
-        'baro_rate' => [],
-        'geom_rate' => [],
+        'baro_rate' => ['feetToMeters'],
+        'geom_rate' => ['feetToMeters'],
         'altitude' => ['feetToMeters'],
         'vert_rate' => ['feetToMeters'],
         'track' => [],
@@ -169,8 +169,8 @@ class Airflight
             return 0.0;
         }
 
-        if ($feets <= 0) {
-            return (float) $feets;
+        if ((float) $feets === 0.0) {
+            return 0.0;
         }
 
         return (float) ($feets / 3.281);

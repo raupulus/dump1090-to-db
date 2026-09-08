@@ -96,6 +96,17 @@ Registro cronológico (más reciente al final) de decisiones de diseño, arquite
 2. **Saneamiento:** Se aplican conversiones estrictas con redondeo a 1 decimal para `vert_rate` y `rssi`, y saneado de cadenas para `emergency` (`null` si viene vacío), garantizando compatibilidad con los tipos esperados en el backend.
 
 ---
+
+## 2026-09-08 — Corrección de Fallback y Conversión de Tasa Vertical (baro_rate / geom_rate)
+
+**Decisión:** Se corrige la extracción y conversión de la tasa vertical en `Aircraft.php` y `Airflight.php` para capturar fielmente las emisiones reales de `dump1090-fa`.
+
+1. **Causa Raíz:** `dump1090-fa` emite la tasa vertical en `aircraft.json` bajo las claves estándar `baro_rate` (tasa barométrica en ft/min) o `geom_rate` (tasa geométrica GPS en ft/min), nunca bajo la clave `vert_rate`. En `src/Models/Aircraft.php`, `setVertRate()` consultaba únicamente `$data['vert_rate']`, omitiendo el fallback a `baro_rate` o `geom_rate` (al contrario de lo que ya hacían `setAltitude()` y `setSpeed()`). Por ello, el 100% de las filas en la tabla local `reports` tenían `vert_rate = NULL`.
+2. **Fallback y Preservación de Cero:** Se programó en `Aircraft::setVertRate()` un selector en cascada sobre `vert_rate`, `baro_rate` y `geom_rate`, preservando valores `0` (vuelo nivelado sin ascenso ni descenso).
+3. **Conversión de Unidades y Tasas Negativas:** Se aplicó la función `feetToMeters` a `baro_rate` y `geom_rate` en `Airflight.php`, y se corrigió la función para convertir valores negativos (tasas de descenso como `-1408` ft/min) dividiendo entre 3.281 en lugar de devolver el valor crudo en pies.
+
+---
 > Creado: 2026-07-03 · Última revisión: 2026-09-08
+
 
 
