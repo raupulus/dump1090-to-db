@@ -52,10 +52,10 @@ class Airflight
         'rc' => [],
         'alt_baro' => ['feetToMeters'],
         'alt_geom' => ['feetToMeters'],
-        'baro_rate' => ['feetToMeters'],
-        'geom_rate' => ['feetToMeters'],
+        'baro_rate' => ['feetPerMinuteToMetersPerSecond'],
+        'geom_rate' => ['feetPerMinuteToMetersPerSecond'],
         'altitude' => ['feetToMeters'],
-        'vert_rate' => ['feetToMeters'],
+        'vert_rate' => ['feetPerMinuteToMetersPerSecond'],
         'track' => [],
         'track_rate' => [],
         'speed' => ['knotsToMeters'],
@@ -174,6 +174,30 @@ class Airflight
         }
 
         return (float) ($feets / 3.281);
+    }
+
+    /**
+     * Convierte de pies por minuto a metros por segundo (m/s).
+     *
+     * @param mixed $fpm Pies por minuto.
+     *
+     * @return float|null
+     */
+    private function feetPerMinuteToMetersPerSecond($fpm)
+    {
+        if ($fpm === null || $fpm === '') {
+            return null;
+        }
+
+        if (($fpm === 'ground') || !is_numeric($fpm)) {
+            return 0.0;
+        }
+
+        if ((float) $fpm === 0.0) {
+            return 0.0;
+        }
+
+        return (float) (($fpm / 3.281) / 60);
     }
 
     /**
