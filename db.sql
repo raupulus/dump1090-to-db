@@ -12,7 +12,7 @@ CREATE TABLE reports
     lon     FLOAT NULL,
     altitude     FLOAT NULL, -- m
     vert_rate     FLOAT NULL, -- m
-    track     INTEGER NULL,
+    track     FLOAT NULL,
     speed     FLOAT NULL, -- mps
     seen_at     TIMESTAMP NULL,
     messages     INTEGER NULL,
