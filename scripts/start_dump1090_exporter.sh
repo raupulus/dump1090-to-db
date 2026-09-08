@@ -1,9 +1,14 @@
+#!/bin/bash
+
 # Captura de señales para finalización limpia e instantánea en systemd
 trap 'echo "Deteniendo dump1090-to-db..."; exit 0' SIGTERM SIGINT
 
+PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "${PROJECT_DIR}"
+
 # Cargar variables de entorno si existe el archivo
-if [ -f .env ]; then
-    export $(grep -v '^#' .env | xargs)
+if [ -f "${PROJECT_DIR}/.env" ]; then
+    export $(grep -v '^#' "${PROJECT_DIR}/.env" | xargs)
 fi
 
 # Valores por defecto si no existen
@@ -14,7 +19,7 @@ count=0
 
 while [[ true ]]
 do
-    timeout 20 php dump1090_exporter.php
+    timeout 20 php "${PROJECT_DIR}/src/dump1090_exporter.php"
 
     count=$((count + 1))
 
@@ -24,7 +29,7 @@ do
 
         count=0
 
-        timeout 30 php upload_data_to_api.php
+        timeout 30 php "${PROJECT_DIR}/src/upload_data_to_api.php"
         sleep $T_INTERVAL_CHECK
     else
         sleep $T_INTERVAL_CHECK

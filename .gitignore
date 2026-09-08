@@ -17,3 +17,5 @@ __pycache__
 /.env
 __init__.py
 /vendor
+/docs/planning/
+/docs/auditorias/

@@ -85,3 +85,6 @@ sudo apt-get full-upgrade -y
 sudo reboot
 ```
 > **Nota:** Procede con precaución con las actualizaciones mayores si estás operando el dispositivo en remoto.
+
+---
+> Creado: 2026-07-05 · Última revisión: 2026-09-08

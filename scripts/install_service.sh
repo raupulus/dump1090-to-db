@@ -10,7 +10,7 @@ if [[ $EUID -ne 0 ]]; then
     exit 1
 fi
 
-PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SERVICE_NAME="dump1090-to-db"
 SERVICE_FILE="/etc/systemd/system/${SERVICE_NAME}.service"
 TEMPLATE_FILE="${PROJECT_DIR}/systemd/${SERVICE_NAME}.service.template"
@@ -25,8 +25,8 @@ fi
 
 ## Resuelve dependencias base (BD + composer) si aún no se han instalado.
 if [[ ! -d "${PROJECT_DIR}/vendor" ]]; then
-    echo "No existen las dependencias de composer, ejecutando ./installer.sh ..."
-    "${PROJECT_DIR}/installer.sh"
+    echo "No existen las dependencias de composer, ejecutando ./scripts/installer.sh ..."
+    "${PROJECT_DIR}/scripts/installer.sh"
 fi
 
 ## Crea el .env si no existe, a partir de la plantilla.
@@ -36,7 +36,7 @@ if [[ ! -f "${PROJECT_DIR}/.env" ]]; then
     cp "${PROJECT_DIR}/.env.example" "${PROJECT_DIR}/.env"
 fi
 
-chmod +x "${PROJECT_DIR}/start_dump1090_exporter.sh"
+chmod +x "${PROJECT_DIR}/scripts/start_dump1090_exporter.sh"
 
 echo "Instalando servicio systemd '${SERVICE_NAME}'"
 echo " - Directorio del proyecto: ${PROJECT_DIR}"

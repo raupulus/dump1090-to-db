@@ -16,12 +16,8 @@
       "ext-curl": "*"
     },
     "autoload": {
-        "classmap": [
-            "Helpers",
-            "Models"
-        ],
         "psr-4": {
-            "App\\": "app/"
+            "App\\": "src/"
         }
     },
     "config": {

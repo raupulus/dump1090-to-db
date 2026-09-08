@@ -10,7 +10,7 @@ use function define;
 use function file_exists;
 use Symfony\Component\Dotenv\Dotenv;
 
-require 'vendor/autoload.php';
+require_once __DIR__ . '/../vendor/autoload.php';
 
 // JSON EXAMPLE
 
@@ -28,7 +28,7 @@ require 'vendor/autoload.php';
 
 ## Overwrite existing env variables
 $dotenv = new Dotenv();
-$dotenv->overload(__DIR__.'/.env');
+$dotenv->overload(__DIR__ . '/../.env');
 
 ## Environment vars
 

@@ -38,11 +38,11 @@ use const DEBUG;
 use const DEVICE_ID;
 use const FILTER_VALIDATE_BOOLEAN;
 
-require 'vendor/autoload.php';
+require_once __DIR__ . '/../vendor/autoload.php';
 
 ## Overwrite existing env variables
 $dotenv = new Dotenv();
-$dotenv->overload(__DIR__ . '/.env');
+$dotenv->overload(__DIR__ . '/../.env');
 
 ## Environment vars
 define('DEBUG', isset($_ENV['DEBUG']) ? filter_var($_ENV['DEBUG'], FILTER_VALIDATE_BOOLEAN) : false);

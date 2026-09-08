@@ -41,16 +41,21 @@ Repository: [https://gitlab.com/raupulus/dump1090-to-db.git](https://gitlab.com/
 
 ```
 .
-├── dump1090_exporter.php      # Entry point: reads aircraft.json and stores rows in DB
-├── upload_data_to_api.php     # Entry point: uploads pending rows to the API and purges them
-├── start_dump1090_exporter.sh # Continuous loop driving both scripts (service entry point)
-├── installer.sh / createdb.sh # DB + dependency provisioning
-├── install_service.sh         # Installs and starts the systemd service
-├── systemd/                   # systemd unit template
-├── db.sql                     # Schema for the `reports` table
-├── Models/                    # Airflight, Aircraft, Dbconnection, Api
-├── Helpers/                   # Log helper
-└── docs/info/                 # Extended technical documentation & decision log
+├── src/                                  # PHP source code and entry points
+│   ├── dump1090_exporter.php             # Reads aircraft.json and stores rows in DB
+│   ├── upload_data_to_api.php            # Uploads pending batches to API V2
+│   ├── Helpers/                          # HardwareInfo, Log
+│   └── Models/                           # Airflight, Aircraft, Dbconnection, Api
+├── scripts/                              # Bash scripts and utilities
+│   ├── start_dump1090_exporter.sh        # Daemon loop driving both scripts
+│   ├── install_service.sh                # Installs and starts the systemd service
+│   ├── installer.sh / createdb.sh        # DB + dependency provisioning
+│   ├── optimize_pi.sh                    # RPi performance and storage tuning
+│   └── update_and_optimize.sh            # OS upgrade and bloatware removal
+├── tests/                                # Automated testing directory
+├── systemd/                              # systemd unit template
+├── db.sql                                # Schema for the `reports` table
+└── docs/                                 # Technical documentation protocol (info, apis, deploys, future)
 ```
 
 See [AGENTS.md](AGENTS.md) for a component-by-component breakdown aimed at contributors and AI coding agents.
@@ -66,14 +71,13 @@ See [AGENTS.md](AGENTS.md) for a component-by-component breakdown aimed at contr
 | `DB_DATABASE` | Database name | `dump1090` |
 | `DB_USERNAME` | Database user | `dbuser` |
 | `DB_PASSWORD` | Database password | — |
-| `API_URL` | Endpoint the accumulated reports are POSTed to | — |
+| `API_URL` | Endpoint the accumulated reports are POSTed to | `https://api.raupulus.dev/api/v2/airflight/aircrafts/batch` |
 | `API_TOKEN` | Bearer token sent to the API | — |
 | `DEVICE_ID` | Hardware/device identifier sent with each upload | — |
+| `BATCH_SIZE` | Batch size per upload request | `100` |
 | `DEBUG` | Enables verbose logging | `false` |
 
 See `.env.example` for a ready-to-copy template (`cp .env.example .env`).
-
-> **Note:** the upload cadence (one upload every 3 exporter iterations) and the polling interval (`sleep 10`) are currently hardcoded in `start_dump1090_exporter.sh`, not read from environment variables. See [docs/info/decisiones.md](docs/info/decisiones.md) for details.
 
 ## Installation
 
@@ -82,31 +86,32 @@ First, set the environment variables and install the software dependencies (sect
 Next, run **installer.sh**. This script creates the database, tables, and resolves composer dependencies.
 
 ```bash
-./installer.sh
+./scripts/installer.sh
 ```
 
 ## Manual start
 
-Preferred method, via script:
+Preferred method, via daemon script:
 
 ```bash
-./start_dump1090_exporter.sh
+./scripts/start_dump1090_exporter.sh
 ```
 
 Manual PHP script execution:
 
 ```bash
-php dump1090_exporter.php
+php src/dump1090_exporter.php
+php src/upload_data_to_api.php
 ```
 
 ## Automatic start
 
 ### systemd service (recommended)
 
-`install_service.sh` sets up and starts `dump1090-to-db` as a systemd service: resolves the base dependencies (`installer.sh`) if missing, creates `.env` from `.env.example` if missing, installs the unit file, and enables + starts the service.
+`scripts/install_service.sh` sets up and starts `dump1090-to-db` as a systemd service: resolves the base dependencies (`installer.sh`) if missing, creates `.env` from `.env.example` if missing, installs the unit file, and enables + starts the service.
 
 ```bash
-sudo ./install_service.sh
+sudo ./scripts/install_service.sh
 ```
 
 Common operations afterwards:
@@ -119,7 +124,7 @@ sudo systemctl stop dump1090-to-db
 sudo systemctl disable dump1090-to-db
 ```
 
-The service runs `start_dump1090_exporter.sh` in a loop (`Type=simple`), restarts automatically on failure (`Restart=on-failure`), and waits for the network to be up before starting (`After=network-online.target`). See the unit template at [systemd/dump1090-to-db.service.template](systemd/dump1090-to-db.service.template) and the rationale in [docs/info/decisiones.md](docs/info/decisiones.md).
+The service runs `scripts/start_dump1090_exporter.sh` in a loop (`Type=simple`), restarts automatically on failure (`Restart=on-failure`), and waits for the network to be up before starting (`After=network-online.target`). See the unit template at [systemd/dump1090-to-db.service.template](systemd/dump1090-to-db.service.template) and the rationale in [docs/info/decisiones-tecnicas.md](docs/info/decisiones-tecnicas.md).
 
 ### Cron job (legacy alternative)
 
@@ -160,8 +165,8 @@ Extended technical documentation, architecture notes and the decision log are ke
 ## Author
 
 - Name: Raúl Caro Pastorino
-- Web: [fryntiz.es](https://raupulus.dev)
-- Twitter: [@fryntiz](https://twitter.com/raupulus)
+- Web: [raupulus.dev](https://raupulus.dev)
+- Twitter: [@raupulus](https://twitter.com/raupulus)
 
 ## License
 
