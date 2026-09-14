@@ -2,6 +2,7 @@
 namespace App\Models;
 
 use PDO;
+use App\Helpers\AircraftMetadataLookup;
 use function implode;
 use function var_dump;
 use function array_fill;
@@ -195,11 +196,15 @@ EOL;
     public function saveAirflight($airflights)
     {
         foreach ($airflights as $airflight) {
+            $metadata = AircraftMetadataLookup::lookup($airflight->icao);
+            $registration = $metadata['registration'] ?? null;
+            $aircraftType = $metadata['aircraft_type'] ?? null;
+
             $query = <<<EOL
             INSERT INTO reports (icao, category, squawk, flight, lon, lat,
                                  altitude, vert_rate, track, speed, messages,
-                                 seen_at, rssi, emergency)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                                 seen_at, rssi, emergency, registration, aircraft_type)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 EOL;
 
             $params = [
@@ -216,7 +221,9 @@ EOL;
                 $airflight->messages ?? null,
                 $airflight->seen_at,
                 $airflight->rssi ?? null,
-                $airflight->emergency
+                $airflight->emergency,
+                $registration,
+                $aircraftType
             ];
 
             if ($query) {
@@ -238,7 +245,8 @@ EOL;
 
         $query = <<<EOL
             SELECT id, icao, category, squawk, flight, lat, lon, altitude, 
-            vert_rate, track, speed, seen_at, messages, rssi, emergency 
+            vert_rate, track, speed, seen_at, messages, rssi, emergency,
+            registration, aircraft_type 
             FROM reports
             ORDER BY seen_at DESC
             LIMIT $limit
@@ -324,7 +332,9 @@ EOL;
                 seen_at TIMESTAMP NULL,
                 messages INTEGER NULL,
                 rssi FLOAT NULL,
-                emergency VARCHAR(100) NULL
+                emergency VARCHAR(100) NULL,
+                registration VARCHAR(100) NULL,
+                aircraft_type VARCHAR(100) NULL
             );
 EOL;
 
@@ -337,6 +347,8 @@ EOL;
 EOL;
 
         $this->execute($queryReports);
+        $this->execute("ALTER TABLE reports ADD COLUMN IF NOT EXISTS registration VARCHAR(100) NULL;");
+        $this->execute("ALTER TABLE reports ADD COLUMN IF NOT EXISTS aircraft_type VARCHAR(100) NULL;");
         $this->execute($queryState);
     }
 

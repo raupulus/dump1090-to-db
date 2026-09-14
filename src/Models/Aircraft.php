@@ -36,6 +36,8 @@ class Aircraft
         $this->setMessages($data);
         $this->setRssi($data);
         $this->setEmergency($data);
+        $this->setRegistration($data);
+        $this->setAircraftType($data);
     }
 
     private function setIcao($data)
@@ -151,5 +153,22 @@ class Aircraft
     private function setEmergency($data)
     {
         $this->emergency = isset($data['emergency']) ? $data['emergency'] : null;
+    }
+
+    public $registration;
+    public $aircraft_type;
+
+    private function setRegistration($data)
+    {
+        $this->registration = isset($data['registration']) && trim((string)$data['registration']) !== ''
+            ? trim((string)$data['registration'])
+            : null;
+    }
+
+    private function setAircraftType($data)
+    {
+        $this->aircraft_type = isset($data['aircraft_type']) && trim((string)$data['aircraft_type']) !== ''
+            ? trim((string)$data['aircraft_type'])
+            : null;
     }
 }

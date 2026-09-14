@@ -152,9 +152,17 @@ function getDbData(int $limit = 100): array
             $vertRate = (isset($row['vert_rate']) && is_numeric($row['vert_rate'])) ? round((float) $row['vert_rate'], 1) : null;
             $rssi = (isset($row['rssi']) && is_numeric($row['rssi'])) ? round((float) $row['rssi'], 1) : null;
             $emergency = isset($row['emergency']) ? trim((string) $row['emergency']) : null;
+            $registration = isset($row['registration']) && trim((string) $row['registration']) !== ''
+                ? trim((string) $row['registration'])
+                : null;
+            $aircraftType = isset($row['aircraft_type']) && trim((string) $row['aircraft_type']) !== ''
+                ? trim((string) $row['aircraft_type'])
+                : null;
 
             $item = [
                 'icao' => $icao,
+                'registration' => $registration,
+                'aircraft_type' => $aircraftType,
                 'flight' => ($flight !== '') ? $flight : null,
                 'squawk' => ($squawk !== '') ? $squawk : null,
                 'lat' => $lat,
