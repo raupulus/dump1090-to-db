@@ -324,9 +324,7 @@ function uploadToApi(array $aircraftList): bool
     curl_close($curl);
 
     if ($curlError) {
-        if (DEBUG) {
-            Log::error("Error cURL al conectar con API: $curlError");
-        }
+        Log::error("Error cURL al conectar con API: $curlError");
         return false;
     }
 
