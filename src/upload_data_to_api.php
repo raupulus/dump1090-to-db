@@ -162,10 +162,10 @@ function getDbData(int $limit = 100): array
                 ? trim((string) $row['aircraft_type'])
                 : null;
             $wtc = isset($row['wtc']) && trim((string) $row['wtc']) !== ''
-                ? trim((string) $row['wtc'])
+                ? substr(trim((string) $row['wtc']), 0, 1)
                 : null;
             $aircraftDesc = isset($row['aircraft_desc']) && trim((string) $row['aircraft_desc']) !== ''
-                ? trim((string) $row['aircraft_desc'])
+                ? substr(trim((string) $row['aircraft_desc']), 0, 5)
                 : null;
 
             // Campos dinámicos de telemetría de ruta
@@ -196,20 +196,28 @@ function getDbData(int $limit = 100): array
             $geomRate = (isset($row['geom_rate']) && is_numeric($row['geom_rate']))
                 ? round((float) $row['geom_rate'], 1)
                 : null;
+
             $nic = (isset($row['nic']) && is_numeric($row['nic']))
                 ? (int) $row['nic']
                 : null;
+            if ($nic !== null && ($nic < 0 || $nic > 11)) {
+                $nic = null;
+            }
+
             $rc = (isset($row['rc']) && is_numeric($row['rc']))
                 ? round((float) $row['rc'], 1)
                 : null;
+            if ($rc !== null && $rc < 0) {
+                $rc = null;
+            }
 
             $item = [
                 'icao' => $icao,
                 'registration' => $registration,
                 'aircraft_type' => $aircraftType,
                 'category' => $category,
-                // 'wtc' => $wtc,
-                // 'aircraft_desc' => $aircraftDesc,
+                'wtc' => $wtc,
+                'aircraft_desc' => $aircraftDesc,
                 'flight' => ($flight !== '') ? $flight : null,
                 'squawk' => ($squawk !== '') ? $squawk : null,
                 'lat' => $lat,
@@ -222,6 +230,8 @@ function getDbData(int $limit = 100): array
                 'seen_pos' => null,
                 'messages' => $messages,
                 'rssi' => $rssi,
+                'nic' => $nic,
+                'rc' => $rc,
                 'emergency' => ($emergency !== '') ? $emergency : null,
                 // 'nav_altitude_mcp' => $navAltitudeMcp,
                 // 'nav_qnh' => $navQnh,
@@ -232,8 +242,6 @@ function getDbData(int $limit = 100): array
                 // 'ias' => $ias,
                 // 'tas' => $tas,
                 // 'geom_rate' => $geomRate,
-                // 'nic' => $nic,
-                // 'rc' => $rc,
             ];
 
             $items[] = $item;
