@@ -197,14 +197,28 @@ EOL;
     {
         foreach ($airflights as $airflight) {
             $metadata = AircraftMetadataLookup::lookup($airflight->icao);
-            $registration = $metadata['registration'] ?? null;
-            $aircraftType = $metadata['aircraft_type'] ?? null;
+            $registration = $metadata['registration'] ?? $airflight->registration ?? null;
+            $aircraftType = $metadata['aircraft_type'] ?? $airflight->aircraft_type ?? null;
+            $wtc = $metadata['wtc'] ?? $airflight->wtc ?? null;
+            $aircraftDesc = $metadata['desc'] ?? $airflight->aircraft_desc ?? null;
 
             $query = <<<EOL
-            INSERT INTO reports (icao, category, squawk, flight, lon, lat,
-                                 altitude, vert_rate, track, speed, messages,
-                                 seen_at, rssi, emergency, registration, aircraft_type)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO reports (
+                icao, category, squawk, flight, lon, lat,
+                altitude, vert_rate, track, speed, messages,
+                seen_at, rssi, emergency, registration, aircraft_type,
+                wtc, aircraft_desc, nav_altitude_mcp, nav_qnh, nav_heading,
+                mach, mag_heading, roll, ias, tas,
+                geom_rate, nic, rc
+            )
+            VALUES (
+                ?, ?, ?, ?, ?, ?,
+                ?, ?, ?, ?, ?,
+                ?, ?, ?, ?, ?,
+                ?, ?, ?, ?, ?,
+                ?, ?, ?, ?, ?,
+                ?, ?, ?
+            )
 EOL;
 
             $params = [
@@ -223,7 +237,20 @@ EOL;
                 $airflight->rssi ?? null,
                 $airflight->emergency,
                 $registration,
-                $aircraftType
+                $aircraftType,
+                $wtc,
+                $aircraftDesc,
+                $airflight->nav_altitude_mcp ?? null,
+                $airflight->nav_qnh ?? null,
+                $airflight->nav_heading ?? null,
+                $airflight->mach ?? null,
+                $airflight->mag_heading ?? null,
+                $airflight->roll ?? null,
+                $airflight->ias ?? null,
+                $airflight->tas ?? null,
+                $airflight->geom_rate ?? null,
+                $airflight->nic ?? null,
+                $airflight->rc ?? null,
             ];
 
             if ($query) {
@@ -246,7 +273,9 @@ EOL;
         $query = <<<EOL
             SELECT id, icao, category, squawk, flight, lat, lon, altitude, 
             vert_rate, track, speed, seen_at, messages, rssi, emergency,
-            registration, aircraft_type 
+            registration, aircraft_type, wtc, aircraft_desc,
+            nav_altitude_mcp, nav_qnh, nav_heading, mach, mag_heading,
+            roll, ias, tas, geom_rate, nic, rc
             FROM reports
             ORDER BY seen_at DESC
             LIMIT $limit
@@ -334,7 +363,20 @@ EOL;
                 rssi FLOAT NULL,
                 emergency VARCHAR(100) NULL,
                 registration VARCHAR(100) NULL,
-                aircraft_type VARCHAR(100) NULL
+                aircraft_type VARCHAR(100) NULL,
+                wtc VARCHAR(10) NULL,
+                aircraft_desc VARCHAR(10) NULL,
+                nav_altitude_mcp FLOAT NULL,
+                nav_qnh FLOAT NULL,
+                nav_heading FLOAT NULL,
+                mach FLOAT NULL,
+                mag_heading FLOAT NULL,
+                roll FLOAT NULL,
+                ias FLOAT NULL,
+                tas FLOAT NULL,
+                geom_rate FLOAT NULL,
+                nic INTEGER NULL,
+                rc FLOAT NULL
             );
 EOL;
 
@@ -349,6 +391,19 @@ EOL;
         $this->execute($queryReports);
         $this->execute("ALTER TABLE reports ADD COLUMN IF NOT EXISTS registration VARCHAR(100) NULL;");
         $this->execute("ALTER TABLE reports ADD COLUMN IF NOT EXISTS aircraft_type VARCHAR(100) NULL;");
+        $this->execute("ALTER TABLE reports ADD COLUMN IF NOT EXISTS wtc VARCHAR(10) NULL;");
+        $this->execute("ALTER TABLE reports ADD COLUMN IF NOT EXISTS aircraft_desc VARCHAR(10) NULL;");
+        $this->execute("ALTER TABLE reports ADD COLUMN IF NOT EXISTS nav_altitude_mcp FLOAT NULL;");
+        $this->execute("ALTER TABLE reports ADD COLUMN IF NOT EXISTS nav_qnh FLOAT NULL;");
+        $this->execute("ALTER TABLE reports ADD COLUMN IF NOT EXISTS nav_heading FLOAT NULL;");
+        $this->execute("ALTER TABLE reports ADD COLUMN IF NOT EXISTS mach FLOAT NULL;");
+        $this->execute("ALTER TABLE reports ADD COLUMN IF NOT EXISTS mag_heading FLOAT NULL;");
+        $this->execute("ALTER TABLE reports ADD COLUMN IF NOT EXISTS roll FLOAT NULL;");
+        $this->execute("ALTER TABLE reports ADD COLUMN IF NOT EXISTS ias FLOAT NULL;");
+        $this->execute("ALTER TABLE reports ADD COLUMN IF NOT EXISTS tas FLOAT NULL;");
+        $this->execute("ALTER TABLE reports ADD COLUMN IF NOT EXISTS geom_rate FLOAT NULL;");
+        $this->execute("ALTER TABLE reports ADD COLUMN IF NOT EXISTS nic INTEGER NULL;");
+        $this->execute("ALTER TABLE reports ADD COLUMN IF NOT EXISTS rc FLOAT NULL;");
         $this->execute($queryState);
     }
 

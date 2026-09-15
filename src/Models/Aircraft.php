@@ -38,6 +38,19 @@ class Aircraft
         $this->setEmergency($data);
         $this->setRegistration($data);
         $this->setAircraftType($data);
+        $this->setWtc($data);
+        $this->setAircraftDesc($data);
+        $this->setNavAltitudeMcp($data);
+        $this->setNavQnh($data);
+        $this->setNavHeading($data);
+        $this->setMach($data);
+        $this->setMagHeading($data);
+        $this->setRoll($data);
+        $this->setIas($data);
+        $this->setTas($data);
+        $this->setGeomRate($data);
+        $this->setNic($data);
+        $this->setRc($data);
     }
 
     private function setIcao($data)
@@ -155,8 +168,35 @@ class Aircraft
         $this->emergency = isset($data['emergency']) ? $data['emergency'] : null;
     }
 
+    public $icao;
+    public $category;
+    public $squawk;
+    public $flight;
+    public $lat;
+    public $lon;
+    public $altitude;
+    public $vert_rate;
+    public $track;
+    public $speed;
+    public $seen_at;
+    public $messages;
+    public $rssi;
+    public $emergency;
     public $registration;
     public $aircraft_type;
+    public $wtc;
+    public $aircraft_desc;
+    public $nav_altitude_mcp;
+    public $nav_qnh;
+    public $nav_heading;
+    public $mach;
+    public $mag_heading;
+    public $roll;
+    public $ias;
+    public $tas;
+    public $geom_rate;
+    public $nic;
+    public $rc;
 
     private function setRegistration($data)
     {
@@ -169,6 +209,98 @@ class Aircraft
     {
         $this->aircraft_type = isset($data['aircraft_type']) && trim((string)$data['aircraft_type']) !== ''
             ? trim((string)$data['aircraft_type'])
+            : null;
+    }
+
+    private function setWtc($data)
+    {
+        $this->wtc = isset($data['wtc']) && trim((string)$data['wtc']) !== ''
+            ? trim((string)$data['wtc'])
+            : null;
+    }
+
+    private function setAircraftDesc($data)
+    {
+        $val = $data['aircraft_desc'] ?? $data['desc'] ?? null;
+        $this->aircraft_desc = $val !== null && trim((string)$val) !== ''
+            ? trim((string)$val)
+            : null;
+    }
+
+    private function setNavAltitudeMcp($data)
+    {
+        $this->nav_altitude_mcp = (isset($data['nav_altitude_mcp']) && is_numeric($data['nav_altitude_mcp']))
+            ? (float) $data['nav_altitude_mcp']
+            : null;
+    }
+
+    private function setNavQnh($data)
+    {
+        $this->nav_qnh = (isset($data['nav_qnh']) && is_numeric($data['nav_qnh']))
+            ? (float) $data['nav_qnh']
+            : null;
+    }
+
+    private function setNavHeading($data)
+    {
+        $this->nav_heading = (isset($data['nav_heading']) && is_numeric($data['nav_heading']))
+            ? (float) $data['nav_heading']
+            : null;
+    }
+
+    private function setMach($data)
+    {
+        $this->mach = (isset($data['mach']) && is_numeric($data['mach']))
+            ? (float) $data['mach']
+            : null;
+    }
+
+    private function setMagHeading($data)
+    {
+        $this->mag_heading = (isset($data['mag_heading']) && is_numeric($data['mag_heading']))
+            ? (float) $data['mag_heading']
+            : null;
+    }
+
+    private function setRoll($data)
+    {
+        $this->roll = (isset($data['roll']) && is_numeric($data['roll']))
+            ? (float) $data['roll']
+            : null;
+    }
+
+    private function setIas($data)
+    {
+        $this->ias = (isset($data['ias']) && is_numeric($data['ias']))
+            ? (float) $data['ias']
+            : null;
+    }
+
+    private function setTas($data)
+    {
+        $this->tas = (isset($data['tas']) && is_numeric($data['tas']))
+            ? (float) $data['tas']
+            : null;
+    }
+
+    private function setGeomRate($data)
+    {
+        $this->geom_rate = (isset($data['geom_rate']) && is_numeric($data['geom_rate']))
+            ? (float) $data['geom_rate']
+            : null;
+    }
+
+    private function setNic($data)
+    {
+        $this->nic = (isset($data['nic']) && is_numeric($data['nic']))
+            ? (int) $data['nic']
+            : null;
+    }
+
+    private function setRc($data)
+    {
+        $this->rc = (isset($data['rc']) && is_numeric($data['rc']))
+            ? (float) $data['rc']
             : null;
     }
 }

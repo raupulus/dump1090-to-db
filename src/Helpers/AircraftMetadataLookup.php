@@ -3,6 +3,7 @@
 namespace App\Helpers;
 
 use Throwable;
+use function file_exists;
 use function file_get_contents;
 use function in_array;
 use function is_array;
@@ -17,38 +18,48 @@ use function trim;
 /**
  * Class AircraftMetadataLookup
  *
- * Resuelve la matrÌcula (registration) y el tipo ICAO de aeronave (aircraft_type)
- * a partir de la base est‚tica local (/usr/share/skyaware/html/db/).
+ * Resuelve la matr√≠cula (registration), el tipo ICAO de aeronave (aircraft_type),
+ * la categor√≠a de turbulencia de estela (wtc) y la descripci√≥n de fuselaje (desc)
+ * a partir de la base est√°tica local (/usr/share/skyaware/html/db/).
  *
  * @package App\Helpers
  */
 class AircraftMetadataLookup
 {
     /**
-     * CachÈ en memoria de ficheros JSON decodificados durante la ejecuciÛn.
+     * Cach√© en memoria de ficheros JSON de ICAO decodificados durante la ejecuci√≥n.
      *
      * @var array<string, array>
      */
     private static array $fileCache = [];
 
     /**
+     * Cach√© en memoria del diccionario de tipos ICAO (icao_aircraft_types.json).
+     *
+     * @var array<string, array>|null
+     */
+    private static ?array $typesCache = null;
+
+    /**
      * Ruta base por defecto de los ficheros de metadatos.
      *
-     * @vqr string
+     * @var string
      */
     private const DEFAULT_DB_PATH = '/usr/share/skyaware/html/db';
 
     /**
-     * Resuelve los metadatos de una aeronave por su cÈdigo ICAO.
+     * Resuelve los metadatos de una aeronave por su c√≥digo ICAO.
      *
-     * @param string|null $icao CÛdigo hexadecimal ICAO de 24 bits (ej. '4ca61f').
-     * @return array{registration: ?string, aircraft_type: ?string}
+     * @param string|null $icao C√≥digo hexadecimal ICAO de 24 bits (ej. '4ca61f').
+     * @return array{registration: ?string, aircraft_type: ?string, wtc: ?string, desc: ?string}
      */
     public static function lookup(?string $icao): array
     {
         $default = [
             'registration' => null,
             'aircraft_type' => null,
+            'wtc' => null,
+            'desc' => null,
         ];
 
         if ($icao === null) {
@@ -101,9 +112,13 @@ class AircraftMetadataLookup
                         ? trim((string) $entry['t'])
                         : null;
 
+                    $typeData = self::getAdditionalTypeData($type, $basePath);
+
                     return [
                         'registration' => $reg,
                         'aircraft_type' => $type,
+                        'wtc' => $typeData['wtc'],
+                        'desc' => $typeData['desc'],
                     ];
                 }
 
@@ -124,12 +139,53 @@ class AircraftMetadataLookup
     }
 
     /**
-     * Limpia la cachÈ en memoria de ficheros JSON.
+     * Obtiene la categor√≠a de estela (wtc) y descripci√≥n de fuselaje (desc) del tipo ICAO.
+     *
+     * @param string|null $type
+     * @param string $basePath
+     * @return array{wtc: ?string, desc: ?string}
+     */
+    private static function getAdditionalTypeData(?string $type, string $basePath): array
+    {
+        $def = ['wtc' => null, 'desc' => null];
+        if ($type === null || $type === '') {
+            return $def;
+        }
+
+        if (self::$typesCache === null) {
+            $file = $basePath . '/aircraft_types/icao_aircraft_types.json';
+            if (is_readable($file)) {
+                $content = file_get_contents($file);
+                $decoded = $content !== false ? json_decode($content, true) : null;
+                self::$typesCache = is_array($decoded) ? $decoded : [];
+            } else {
+                self::$typesCache = [];
+            }
+        }
+
+        $upper = strtoupper(trim($type));
+        if (isset(self::$typesCache[$upper]) && is_array(self::$typesCache[$upper])) {
+            $entry = self::$typesCache[$upper];
+            $wtc = isset($entry['wtc']) && trim((string) $entry['wtc']) !== ''
+                ? trim((string) $entry['wtc'])
+                : null;
+            $desc = isset($entry['desc']) && trim((string) $entry['desc']) !== ''
+                ? trim((string) $entry['desc'])
+                : null;
+            return ['wtc' => $wtc, 'desc' => $desc];
+        }
+
+        return $def;
+    }
+
+    /**
+     * Limpia la cach√©.
      *
      * @return void
      */
     public static function clearCache(): void
     {
         self::$fileCache = [];
+        self::$typesCache = null;
     }
 }

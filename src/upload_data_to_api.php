@@ -161,12 +161,55 @@ function getDbData(int $limit = 100): array
             $aircraftType = isset($row['aircraft_type']) && trim((string) $row['aircraft_type']) !== ''
                 ? trim((string) $row['aircraft_type'])
                 : null;
+            $wtc = isset($row['wtc']) && trim((string) $row['wtc']) !== ''
+                ? trim((string) $row['wtc'])
+                : null;
+            $aircraftDesc = isset($row['aircraft_desc']) && trim((string) $row['aircraft_desc']) !== ''
+                ? trim((string) $row['aircraft_desc'])
+                : null;
+
+            // Campos dinámicos de telemetría de ruta
+            $navAltitudeMcp = (isset($row['nav_altitude_mcp']) && is_numeric($row['nav_altitude_mcp']))
+                ? round((float) $row['nav_altitude_mcp'], 1)
+                : null;
+            $navQnh = (isset($row['nav_qnh']) && is_numeric($row['nav_qnh']))
+                ? round((float) $row['nav_qnh'], 1)
+                : null;
+            $navHeading = (isset($row['nav_heading']) && is_numeric($row['nav_heading']))
+                ? (int) round((float) $row['nav_heading'])
+                : null;
+            $mach = (isset($row['mach']) && is_numeric($row['mach']))
+                ? round((float) $row['mach'], 3)
+                : null;
+            $magHeading = (isset($row['mag_heading']) && is_numeric($row['mag_heading']))
+                ? (int) round((float) $row['mag_heading'])
+                : null;
+            $roll = (isset($row['roll']) && is_numeric($row['roll']))
+                ? round((float) $row['roll'], 1)
+                : null;
+            $ias = (isset($row['ias']) && is_numeric($row['ias']))
+                ? round((float) $row['ias'], 1)
+                : null;
+            $tas = (isset($row['tas']) && is_numeric($row['tas']))
+                ? round((float) $row['tas'], 1)
+                : null;
+            $geomRate = (isset($row['geom_rate']) && is_numeric($row['geom_rate']))
+                ? round((float) $row['geom_rate'], 1)
+                : null;
+            $nic = (isset($row['nic']) && is_numeric($row['nic']))
+                ? (int) $row['nic']
+                : null;
+            $rc = (isset($row['rc']) && is_numeric($row['rc']))
+                ? round((float) $row['rc'], 1)
+                : null;
 
             $item = [
                 'icao' => $icao,
                 'registration' => $registration,
                 'aircraft_type' => $aircraftType,
                 'category' => $category,
+                // 'wtc' => $wtc,
+                // 'aircraft_desc' => $aircraftDesc,
                 'flight' => ($flight !== '') ? $flight : null,
                 'squawk' => ($squawk !== '') ? $squawk : null,
                 'lat' => $lat,
@@ -180,6 +223,17 @@ function getDbData(int $limit = 100): array
                 'messages' => $messages,
                 'rssi' => $rssi,
                 'emergency' => ($emergency !== '') ? $emergency : null,
+                // 'nav_altitude_mcp' => $navAltitudeMcp,
+                // 'nav_qnh' => $navQnh,
+                // 'nav_heading' => $navHeading,
+                // 'mach' => $mach,
+                // 'mag_heading' => $magHeading,
+                // 'roll' => $roll,
+                // 'ias' => $ias,
+                // 'tas' => $tas,
+                // 'geom_rate' => $geomRate,
+                // 'nic' => $nic,
+                // 'rc' => $rc,
             ];
 
             $items[] = $item;
