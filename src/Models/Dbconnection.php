@@ -404,6 +404,7 @@ EOL;
         $this->execute("ALTER TABLE reports ADD COLUMN IF NOT EXISTS geom_rate FLOAT NULL;");
         $this->execute("ALTER TABLE reports ADD COLUMN IF NOT EXISTS nic INTEGER NULL;");
         $this->execute("ALTER TABLE reports ADD COLUMN IF NOT EXISTS rc FLOAT NULL;");
+        $this->execute("ALTER TABLE reports ALTER COLUMN track TYPE FLOAT;");
         $this->execute($queryState);
     }
 
