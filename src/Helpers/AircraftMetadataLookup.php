@@ -139,6 +139,33 @@ class AircraftMetadataLookup
     }
 
     /**
+     * Diccionario complementario de tipos ICAO para variantes modernas no indexadas en SkyAware.
+     *
+     * @var array<string, array{wtc: string, desc: string}>
+     */
+    private const CUSTOM_AIRCRAFT_TYPES = [
+        // Familia Boeing 737 MAX
+        'B37M' => ['wtc' => 'M', 'desc' => 'L2J'], // Boeing 737 MAX 7
+        'B38M' => ['wtc' => 'M', 'desc' => 'L2J'], // Boeing 737 MAX 8
+        'B39M' => ['wtc' => 'M', 'desc' => 'L2J'], // Boeing 737 MAX 9
+        'B3JM' => ['wtc' => 'M', 'desc' => 'L2J'], // Boeing 737 MAX 10
+
+        // Familia Airbus A320neo
+        'A19N' => ['wtc' => 'M', 'desc' => 'L2J'], // Airbus A319neo
+        'A20N' => ['wtc' => 'M', 'desc' => 'L2J'], // Airbus A320neo
+        'A21N' => ['wtc' => 'M', 'desc' => 'L2J'], // Airbus A321neo
+        'A21X' => ['wtc' => 'M', 'desc' => 'L2J'], // Airbus A321XLR
+
+        // Familia Embraer E-Jets E2
+        'E290' => ['wtc' => 'M', 'desc' => 'L2J'], // Embraer E190-E2
+        'E295' => ['wtc' => 'M', 'desc' => 'L2J'], // Embraer E195-E2
+
+        // Familia Bombardier Global
+        'GL7T' => ['wtc' => 'M', 'desc' => 'L2J'], // Bombardier Global 7500
+        'GL8T' => ['wtc' => 'M', 'desc' => 'L2J'], // Bombardier Global 8000
+    ];
+
+    /**
      * Obtiene la categoría de estela (wtc) y descripción de fuselaje (desc) del tipo ICAO.
      *
      * @param string|null $type
@@ -152,6 +179,8 @@ class AircraftMetadataLookup
             return $def;
         }
 
+        $upper = strtoupper(trim($type));
+
         if (self::$typesCache === null) {
             $file = $basePath . '/aircraft_types/icao_aircraft_types.json';
             if (is_readable($file)) {
@@ -163,7 +192,6 @@ class AircraftMetadataLookup
             }
         }
 
-        $upper = strtoupper(trim($type));
         if (isset(self::$typesCache[$upper]) && is_array(self::$typesCache[$upper])) {
             $entry = self::$typesCache[$upper];
             $wtc = isset($entry['wtc']) && trim((string) $entry['wtc']) !== ''
@@ -172,7 +200,14 @@ class AircraftMetadataLookup
             $desc = isset($entry['desc']) && trim((string) $entry['desc']) !== ''
                 ? trim((string) $entry['desc'])
                 : null;
-            return ['wtc' => $wtc, 'desc' => $desc];
+            if ($wtc !== null || $desc !== null) {
+                return ['wtc' => $wtc, 'desc' => $desc];
+            }
+        }
+
+        // Fallback a diccionario complementario local del proyecto
+        if (isset(self::CUSTOM_AIRCRAFT_TYPES[$upper])) {
+            return self::CUSTOM_AIRCRAFT_TYPES[$upper];
         }
 
         return $def;
