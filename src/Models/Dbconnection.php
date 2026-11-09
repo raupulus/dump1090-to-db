@@ -345,6 +345,11 @@ EOL;
      */
     public function ensureTablesExist(): void
     {
+        $schemaFlagFile = '/tmp/dump1090_schema_v2.init';
+        if (\is_file($schemaFlagFile)) {
+            return;
+        }
+
         $queryReports = <<<EOL
             CREATE TABLE IF NOT EXISTS reports (
                 id BIGSERIAL PRIMARY KEY,
@@ -406,6 +411,7 @@ EOL;
         $this->execute("ALTER TABLE reports ADD COLUMN IF NOT EXISTS rc FLOAT NULL;");
         $this->execute("ALTER TABLE reports ALTER COLUMN track TYPE FLOAT;");
         $this->execute($queryState);
+        @\file_put_contents($schemaFlagFile, (string) \time());
     }
 
     /**

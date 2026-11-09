@@ -85,8 +85,14 @@ try {
 
 function getDbConnection(): ?Dbconnection
 {
+    static $db = null;
+    if ($db !== null) {
+        return $db;
+    }
+
     try {
-        return new Dbconnection(DB_PARAMS);
+        $db = new Dbconnection(DB_PARAMS);
+        return $db;
     } catch (Exception $e) {
         if (DEBUG) {
             Log::error(DB_ERROR_CONNECTION);
